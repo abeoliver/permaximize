@@ -1,26 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
+import {Grid} from '@material-ui/core';
+import {Permaximize} from './components/permaximize/Permaximize';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App">
+        <header className="App-header">
+          <Grid container spacing={8}>
+            <Grid item xs={12} md={12}>
+              <Permaximize/>
+            </Grid>
+          </Grid>
+        </header>
+      </div>
   );
 }
+/*
+<Grid item xs={12}>Topbar</Grid>
+          <Grid item xs={12} md={4}>Navbar</Grid>
+ */
 
 export default App;
