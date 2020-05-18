@@ -310,22 +310,22 @@
 
 /* Hover only if not on mobile */
 @media (min-width: 800px) {
-    .game-title-screen:hover {
+    .game-title-screen-hover {
         width: 100vw;
         height: 100vh;
         margin: 0;
         background: var(--gradient);
     }
 
-    .game-title-screen:hover #game-title-main,
-    .game-title-screen:hover #game-title-author {
+    .game-title-screen-hover #game-title-main,
+    .game-title-screen-hover #game-title-author {
         color: white;
         background: none;
         -webkit-background-clip: inherit;
         -webkit-text-fill-color: white;
     }
 
-    .game-title-screen:hover #game-title-play {
+    .game-title-screen-hover #game-title-play {
         color: white;
         border: 10px solid white;
         background: none;

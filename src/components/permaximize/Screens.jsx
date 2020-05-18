@@ -7,16 +7,30 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import './Permaximize.css';
 
-export function TitleScreen() {
-  return (
-      <div className="game-title-screen">
-        <h1 id="game-title-main">Permaximize</h1>
-        <h3 id="game-title-author">by Abraham Oliver</h3>
-        <Link to="/permaximize/game" style={{textDecoration: "none"}}>
-          <h3 id="game-title-play"> Play Now </h3>
-        </Link>
-      </div>
-  );
+export class TitleScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hovered: false};
+    this.hover = () => this.setState({hovered: true});
+    this.unHover = () => this.setState({hovered: false});
+  }
+
+
+  render() {
+    return (
+        <div className={"game-title-screen" + (this.state.hovered ? " game-title-screen-hover" : "")}>
+          <h1 id="game-title-main">Permaximize</h1>
+          <h3 id="game-title-author">by Abraham Oliver</h3>
+          <Link to="/permaximize/game" style={{textDecoration: "none"}}>
+            <h3 id="game-title-play"
+                onMouseEnter={this.hover}
+                onMouseLeave={this.unHover}>
+              Play Now
+            </h3>
+          </Link>
+        </div>
+    );
+  }
 }
 
 export function HelpScreen(props) {
