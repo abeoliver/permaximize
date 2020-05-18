@@ -20,7 +20,7 @@ import './Permaximize.css';
 
 function Piece(props) {
   return (
-      <span className={"game-piece game-piece-status-" + props.status}
+      <span className={"game-piece game-piece-status-" + props.status + " game-piece-largest-" + props.largest}
             onClick={props.handleClick}/>
   );
 }
@@ -44,6 +44,14 @@ function getTheme(player) {
       secondary: player === 1 ? player2 : player1,
     },
   });
+}
+
+function zeros(w) {
+  let arr = [];
+  for (let i = 0; i < w; i++) {
+    arr.push(new Array(w).fill(0));
+  }
+  return arr;
 }
 
 /* Main App Container with Title, Game, and Help dialogues */
@@ -73,21 +81,23 @@ class Game extends React.Component {
     super(props);
     this.size = 7;
     this.maxTurn = 14;
-    this.state = this.initialState();
+    this.state = this.initialState(true);
     this.searched = null;
-    this.search = this.search.bind(this);
+    this._searchCount = this._searchCount.bind(this);
   }
 
-  initialState() {
+  initialState(showHelp) {
     return {
       board: this.initialBoard(),
+      largest: zeros(this.size),
       selected: null,
       score: [1, 1],
       turn: 0,
-      showHelp: true
+      showHelp: showHelp
     };
   };
-  resetState = () => this.setState(this.initialState());
+
+  resetState = () => this.setState(this.initialState(false));
 
   currentPlayer = () => (this.state.turn % 2) + 1;
   opposingPlayer = () => this.currentPlayer() === 1 ? 2 : 1;
@@ -129,6 +139,7 @@ class Game extends React.Component {
       for (let j = 0; j < this.state.board[0].length; j++) {
         list.push(
             <Piece status={this.state.board[i][j]} key={[i, j]}
+                   largest={this.state.largest[i][j]}
                    handleClick={() => this.handlePieceClick(i, j)}/>
         );
       }
@@ -188,27 +199,68 @@ class Game extends React.Component {
     this.setState({score: [this.calculateScore(1), this.calculateScore(2)]});
   }
 
+  recordLargestBlob(r, c, player) {
+    // Clear previous
+    debugger;
+    let largest = [...this.state.largest];
+    for (let i = 0; i < largest.length; i++) {
+      for (let j = 0; j < largest.length; j++) {
+        if (largest[i][j] === player) largest[i][j] = 0;
+      }
+    }
+    // Run recorder
+    this._recordLargestBlob(r, c, player, largest);
+    this.setState({largest: largest});
+  }
+
+  _recordLargestBlob(r, c, player, largest) {
+    // Base cases
+    if (r < 0 || c < 0 || r > this.size - 1 || c > this.size - 1) {
+      return;
+    } else if ((this.state.board[r][c] % 2) !== 2 - player || largest[r][c]) {
+      return;
+    }
+    // Mark searched
+    largest[r][c] = player;
+    // Search left, up, right, down
+    this._recordLargestBlob(r, c - 1, player, largest);
+    this._recordLargestBlob(r - 1, c, player, largest);
+    this._recordLargestBlob(r, c + 1, player, largest);
+    this._recordLargestBlob(r + 1, c, player, largest);
+
+  }
+
   /*
    * calculateScore
    * Calculate largest chain for a given player
+   * Side effect: save largest to largest blob tracker
    */
   calculateScore(player) {
     // Clear search array
-    this.searched = new Array(this.size).fill(new Array(this.size).fill(0));
+    this.searched = zeros(this.size);
+    let largest = [0, player - 1]
     let maxSize = 0;
+    let count = 0;
     for (let r = 0; r < this.size; r++) {
       for (let c = 0; c < this.size; c++) {
-        maxSize = Math.max(this.search(r, c, player), maxSize);
+        count = this._searchCount(r, c, player)
+        if (count > maxSize) {
+          largest = [r, c];
+          maxSize = count;
+        }
       }
     }
+    // Record largest blob
+    this.recordLargestBlob(largest[0], largest[1], player);
     return maxSize;
   }
 
   /*
-   * search
+   * _searchCount
    * Recursive search to count chains
+   * Do not call out of the context of calculateScore
    */
-  search(row, col, player) {
+  _searchCount(row, col, player) {
     // Base cases
     if (row < 0 || col < 0 || row > this.size - 1 || col > this.size - 1) {
       return 0;
@@ -216,12 +268,10 @@ class Game extends React.Component {
       return 0;
     }
     // Mark searched
-    let rowArray = [...this.searched[row]];
-    rowArray[col] = 1;
-    this.searched[row] = rowArray;
+    this.searched[row][col] = player;
     // Search left, up, right, down
-    return 1 + this.search(row, col - 1, player) + this.search(row - 1, col, player) +
-        this.search(row, col + 1, player) + this.search(row + 1, col, player);
+    return 1 + this._searchCount(row, col - 1, player) + this._searchCount(row - 1, col, player) +
+        this._searchCount(row, col + 1, player) + this._searchCount(row + 1, col, player);
   }
 
   scoreHeader() {

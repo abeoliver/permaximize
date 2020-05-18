@@ -32,7 +32,7 @@ export function HelpScreen(props) {
 const helpText = `
 Welcome to Permaximize! To start, grab a friend and choose who will be blue (plays first)
 and who will be pink. Each player has 7 turns to build the largest continuous blob of their
-color (without diagonals). On a given player's turn, they choose one of their own pieces and choose one of their
+color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
 opponent's pieces to swap. Once they have swapped the two, the piece of their own is now
 "solidified" and cannot be moved for the rest of the game; these pieces are marked with a hollow center.
  Use solidified pieces to cut your opponents blob and fortify your own!

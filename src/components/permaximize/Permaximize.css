@@ -8,7 +8,9 @@
     --light-primary: #6ec6ff;
     --dark-secondary: #c60055;
     --light-secondary: #ff79b0;
-    --gradient: linear-gradient(45deg, var(--primary-color) 35%, var(--secondary-color) 65%);
+    --gradient: linear-gradient(45deg, var(--primary-color) 30%, var(--secondary-color) 70%);
+    --secondary-gradient: linear-gradient(45deg, var(--primary-color) 42%, var(--secondary-color) 58%);
+    --light-gradient: linear-gradient(45deg, var(--light-primary) 35%, var(--light-secondary) 65%);
 }
 
 .game {
@@ -30,7 +32,7 @@
 
 #game-main-title {
     font-size: 2em;
-    background: var(--gradient);
+    background: var(--secondary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0;
@@ -41,17 +43,17 @@
     font-size: 1em;
     margin-top: 0;
     margin-bottom: 0;
-    background: var(--gradient);
+    background: var(--secondary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 #game-help-button {
     border: 6px solid;
-    border-image-source: var(--gradient);
+    border-image-source: var(--light-gradient);
     border-image-slice: 1;
 
-    background: var(--gradient);
+    background: var(--light-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
@@ -174,24 +176,24 @@
 
 /* Player 1 Normal */
 .game-piece-status-1 {
-    background-color: var(--player-color-1);
+    background-color: var(--light-primary);
 }
 
 /* Player 2 Normal */
 .game-piece-status-2 {
-    background-color: var(--player-color-2);
+    background-color: var(--light-secondary);
 }
 
 /* Player 1 Solid */
 .game-piece-status-3 {
     background-color: white;
-    border: 10px solid var(--player-color-1);
+    border: 15px solid var(--light-primary);
 }
 
 /* Player 2 Solid */
 .game-piece-status-4 {
     background-color: white;
-    border: 10px solid var(--player-color-2);
+    border: 15px solid var(--light-secondary);
 }
 
 /* Player 1 Selected */
@@ -204,8 +206,41 @@
     background-color: var(--dark-secondary);
 }
 
+/* Player 1 Largest Member */
+.game-piece-largest-1 {
+    background-color: var(--primary-color);
+}
+
+/* Player 2 Largest Member */
+.game-piece-largest-2 {
+    background-color: var(--secondary-color);
+}
+
+/* Player 1 Solid & Largest */
+.game-piece-status-3.game-piece-largest-1 {
+    background: white;
+    border-color: var(--primary-color);
+}
+
+/* Player 1 Solid & Largest */
+.game-piece-status-4.game-piece-largest-2 {
+    background: white;
+    border-color: var(--secondary-color);
+}
+
+/* Player 1 Selected & Largest */
+.game-piece-status-5.game-piece-largest-1 {
+    background-color: var(--dark-primary);
+}
+
+/* Player 2 Selected & Largest */
+.game-piece-status-6.game-piece-largest-2 {
+    background-color: var(--dark-secondary);
+}
+
 /************** Title Screen **************/
 .game-title-screen {
+    justify-content: center;
 }
 
 #game-title-main {
@@ -258,18 +293,18 @@
 @media (max-width: 800px) {
     #game-title-main {
         font-size: 3em;
-        top: 20vh;
+        top: 25vh;
     }
 
     #game-title-author {
         font-size: 1.5em;
-        top: 30vh;
+        top: 35vh;
     }
 
     #game-title-play {
-        top: 35vh;
+        top: 40vh;
         width: 7em;
-        margin: 1em -3.5em;
+        margin: 1em -3.75em;
     }
 }
 
