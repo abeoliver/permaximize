@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from "react-router-dom";
-import './Permaximize.css';
+import './Screens.css';
 
 export class TitleScreen extends React.Component {
   constructor(props) {

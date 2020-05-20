@@ -13,17 +13,10 @@
 
 import React from 'react';
 import {HashRouter, Route} from "react-router-dom";
-import { LinearProgress, Button } from "@material-ui/core";
+import { LinearProgress, Button, Hidden } from "@material-ui/core";
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { HelpScreen, TitleScreen } from './Screens';
 import './Permaximize.css';
-
-function Piece(props) {
-  return (
-      <span className={"game-piece game-piece-status-" + props.status + " game-piece-largest-" + props.largest}
-            onClick={props.handleClick}/>
-  );
-}
 
 function getTheme(player) {
   const player1 = {
@@ -70,6 +63,14 @@ export class Permaximize extends React.Component {
         </HashRouter>
     );
   }
+}
+
+function Piece(props) {
+  return (
+      <span className={"game-piece game-piece-status-" + props.status + " game-piece-largest-" + props.largest}
+            onClick={props.handleClick} key={props.number}>
+      </span>
+  );
 }
 
 /*
@@ -127,24 +128,6 @@ class Game extends React.Component {
       board.push(row);
     }
     return board;
-  }
-
-  /*
-   * createBoardPieces
-   * Generate a list of Piece components matching state.board's config
-   */
-  createBoardPieces() {
-    let list = [];
-    for (let i = 0; i < this.state.board.length; i++) {
-      for (let j = 0; j < this.state.board[0].length; j++) {
-        list.push(
-            <Piece status={this.state.board[i][j]} key={[i, j]}
-                   largest={this.state.largest[i][j]}
-                   handleClick={() => this.handlePieceClick(i, j)}/>
-        );
-      }
-    }
-    return list;
   }
 
   /*
@@ -274,48 +257,80 @@ class Game extends React.Component {
         this._searchCount(row, col + 1, player) + this._searchCount(row + 1, col, player);
   }
 
+  /****** RENDERS ******/
+  /*
+   * scoreHeader
+   */
   scoreHeader() {
     // If game is over, show GAME OVER
-    if (this.state.turn >= this.maxTurn) {
-      return (
-          <div className="game-score-header game-score-header-win">
-            <h3 className={"game-win-text game-win-text-" + this.winningPlayer()}>
-              {this.winningPlayer() === 0 ? "A tie!" : "Player " + this.winningPlayer() + " wins!"}
-            </h3>
-            <p className={"game-win-link game-win-link-" + this.winningPlayer()}
-               onClick={this.resetState}>
-              Click here to start again
+    let over = this.state.turn >= this.maxTurn;
+    return (
+        <div className="game-score-header" onClick={(over ? this.resetState : null)}>
+          <div className="game-win-winner-container" style={{marginRight: "1em"}}>
+            <p id="game-win-winner"
+               style={{visibility: (over ? "visible" : "hidden"),
+                        color: "var(--primary)"}}>
+              {this.winningPlayer() === 1 ? "Winner" : "Play again!"}
+            </p>
+            <p className={"game-score " + (this.currentPlayer() === 1 && !over ? "game-score-current" : "")}
+               id="game-score-1">
+              {this.state.score[0]}
             </p>
           </div>
-      );
-    }
-    return (
-        <div className="game-score-header">
-          <h3 className={"game-score " + (this.currentPlayer() === 1 ? "game-score-current" : "")}
-              id="game-score-1">
-            {this.state.score[0]}
-          </h3>
-          <h3 className={"game-score " + (this.currentPlayer() === 2 ? "game-score-current" : "")}
-              id="game-score-2">
-            {this.state.score[1]}
-          </h3>
+
+          <div className="game-win-winner-container">
+            <p id="game-win-winner"
+               style={{visibility: (over ? "visible" : "hidden"),
+                       color: "var(--secondary)"}}>
+              {this.winningPlayer() === 2 ? "Winner" : "Play again!"}
+            </p>
+            <p className={"game-score " + (this.currentPlayer() === 2 && !over ? "game-score-current" : "")}
+               id="game-score-2">
+              {this.state.score[1]}
+            </p>
+          </div>
         </div>
     );
+  }
+
+  /*
+   * createBoardPieces
+   * Generate a list of Piece components matching state.board's config
+   */
+  createBoardPieces() {
+    let list = [];
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        list.push(
+            <Piece status={this.state.board[i][j]} key={[i, j]}
+                   largest={this.state.largest[i][j]}
+                   handleClick={() => this.handlePieceClick(i, j)}
+                   number={(i * this.size) + j + 1}
+            />
+        );
+      }
+    }
+    return list;
   }
 
   render() {
     if (!this.state.showHelp) {
       return (
           <div id="game-container">
-            <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>Help</Button>
+            <Hidden mdDown>
+              <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>Help</Button>
+            </Hidden>
             <h1 id="game-main-title">Permaximize</h1>
             <h4 id="game-main-title-author">Abraham Oliver</h4>
+
             <div className="game">
               {this.scoreHeader()}
+
               <div className="game-board-grid"
                    style={{gridTemplateColumns: "repeat(" + this.size + ", auto)"}}>
                 {this.createBoardPieces()}
               </div>
+
               <ThemeProvider theme={getTheme(this.currentPlayer())}>
                 <LinearProgress variant="determinate" value={(this.state.turn / this.maxTurn) * 100}
                                 className="game-progress-bar"/>
