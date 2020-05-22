@@ -1,7 +1,6 @@
 import React from 'react';
 import {Grid} from '@material-ui/core';
 import {Permaximize} from './components/permaximize/Permaximize';
-import { NetTest } from './components/permaximize/Multiplayer';
 import './App.css';
 
 function App() {

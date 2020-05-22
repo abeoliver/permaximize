@@ -13,12 +13,13 @@
 
 import React from 'react';
 import { LinearProgress, Button, Hidden } from "@material-ui/core";
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import { HelpScreen } from './Screens';
-import './Game.css';
+import './BasicGame.css';
+
+const gameUtil = require("./game_util");
 
 function getTheme(player) {
-  /*
   let docStyles = getComputedStyle(document.getElementById("permaximize-main"));
   const player1 = {
     light: docStyles.getPropertyValue("--primary-light").toString(),
@@ -32,16 +33,7 @@ function getTheme(player) {
     palette: {
       primary: player === 1 ? player1 : player2,
     },
-  });*/
-  return createMuiTheme({});
-}
-
-function zeros(w) {
-  let arr = [];
-  for (let i = 0; i < w; i++) {
-    arr.push(new Array(w).fill(0));
-  }
-  return arr;
+  });
 }
 
 function Piece(props) {
@@ -55,7 +47,7 @@ function Piece(props) {
  * Game
  * Main game control component
  */
-export class Game extends React.Component {
+export class BasicGame extends React.Component {
   constructor(props) {
     super(props);
     this.size = 7;
@@ -66,7 +58,8 @@ export class Game extends React.Component {
       selected: null,
       score: [0, 0],
       turn: 0,
-      showHelp: true
+      showHelp: true,
+      msg: ""
     };
     this.searched = null;
     this._searchCount = this._searchCount.bind(this);
@@ -78,12 +71,13 @@ export class Game extends React.Component {
 
   initialState(showHelp) {
     return {
-      board: this.initialBoard(),
-      largest: zeros(this.size),
+      board: gameUtil.initialBoard(this.size),
+      largest: gameUtil.zeros(this.size),
       selected: null,
       score: [1, 1],
       turn: 0,
-      showHelp: showHelp
+      showHelp: showHelp,
+      msg: ""
     };
   };
 
@@ -100,35 +94,12 @@ export class Game extends React.Component {
   }
 
   /*
-   * initialBoard
-   * Create the initial board state array
-   */
-  initialBoard() {
-    let board = [];
-    for (let i = 0; i < this.size; i++) {
-      let row = [];
-      // Alternate row start color
-      let status = (i % 2) + 1;
-      for (let j = 0; j < this.size; j++) {
-        row.push(status);
-        // Flip color for next piece
-        status = (status === 1 ? 2 : 1);
-      }
-      board.push(row);
-    }
-    return board;
-  }
-
-  /*
    * handlePieceClick
    * Handler for selecting and switching pieces
    */
   handlePieceClick(row, col) {
-    // Do not allow clicking if game is over
-    if (this.state.turn >= this.maxTurn) return;
+    if (!this.allowClick(row, col)) return;
     let newBoard = this.state.board;
-    // Do not choose a solid piece for any reason
-    if (newBoard[row][col] === 3 || newBoard[row][col] === 4) return;
     // Set the main selected piece if not chosen yet
     if (this.state.selected === null) {
       // Do not choose a piece of the other color
@@ -137,7 +108,7 @@ export class Game extends React.Component {
       newBoard[row][col] = newBoard[row][col] + 4;
       this.setState({selected: [row, col], board: newBoard});
       return;
-      // Un-choose if already selected
+    // Un-choose if already selected
     } else if (this.state.selected[0] === row && this.state.selected[1] === col) {
       newBoard[row][col] = newBoard[row][col] - 4;
       this.setState({selected: null, board: newBoard});
@@ -145,23 +116,27 @@ export class Game extends React.Component {
     }
     // Do not choose a piece of the player's own color
     if (newBoard[row][col] === this.currentPlayer()) return;
-    // Tell game control to flip pieces
-    newBoard = this.flipPieces(newBoard, this.state.selected, [row, col]);
-    // Make solid status
-    newBoard[row][col] -= 2;
-    this.setState({selected: null, board: newBoard, turn: this.state.turn + 1});
-    this.updateScore();
+    // If a valid move has been chosen
+    this.executeMove([row, col], this.state.selected);
   }
 
-  /*
-   * flipPieces
-   * Flip two game pieces
-   */
-  flipPieces(board, selected, second) {
-    let tmp = board[second[0]][second[1]];
-    board[second[0]][second[1]] = board[selected[0]][selected[1]];
-    board[selected[0]][selected[1]] = tmp;
-    return board;
+  allowClick(row, col) {
+    // Do not allow clicking if game is over
+    if (this.state.turn >= this.maxTurn) return false;
+    // Do not choose a solid piece (return true default)
+    return !(this.state.board[row][col] === 3 || this.state.board[row][col] === 4);
+
+  }
+
+  executeMove(move, selected) {
+    // Flip board pieces
+    let newBoard = gameUtil.flipPieces(this.state.board, selected, move);
+    // Make solid status
+    newBoard[move[0]][move[1]] -= 2;
+    // Save updated game state
+    this.setState({selected: null, board: newBoard, turn: this.state.turn + 1});
+    // Update score
+    this.updateScore();
   }
 
   /*
@@ -216,7 +191,7 @@ export class Game extends React.Component {
    */
   calculateScore(player) {
     // Clear search array
-    this.searched = zeros(this.size);
+    this.searched = gameUtil.zeros(this.size);
     let largest = [0, player - 1]
     let maxSize = 0;
     let count = 0;
@@ -230,7 +205,9 @@ export class Game extends React.Component {
       }
     }
     // Record largest blob
-    this.recordLargestBlob(largest[0], largest[1], player);
+    if (maxSize > 1) {
+      this.recordLargestBlob(largest[0], largest[1], player);
+    }
     return maxSize;
   }
 
@@ -308,6 +285,10 @@ export class Game extends React.Component {
     return list;
   }
 
+  helpScreen() {
+    return <HelpScreen onClick={() => this.setState({showHelp: false})}/>;
+  }
+
   render() {
     if (!this.state.showHelp) {
       return (
@@ -335,6 +316,6 @@ export class Game extends React.Component {
       );
     }
     // Show Help Screen
-    return (<HelpScreen onClick={() => this.setState({showHelp: false})}/>);
+    return this.helpScreen();
   }
 }

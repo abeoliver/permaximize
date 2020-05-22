@@ -14,7 +14,7 @@
 import React from 'react';
 import {HashRouter, Route} from "react-router-dom";
 import { TitleScreen } from './Screens';
-import { Game } from './Game';
+import { BasicGame } from './BasicGame';
 import { MultiplayerGame } from "./Multiplayer";
 import './Permaximize.css';
 import { themes } from "./themes";
@@ -42,11 +42,11 @@ export class Permaximize extends React.Component {
             <TitleScreen/>
           </Route>
           <Route exact path="/permaximize/game">
-            <Game/>
+            <BasicGame/>
           </Route>
-          <Route path="/permaximize/game/multiplayer">
-            <MultiplayerGame/>
-          </Route>
+          {/* NEED ROUTE TO MULTIPLAYER CREATION*/}
+          <Route path="/permaximize/game/multiplayer/:player/:id"
+                render={props => <MultiplayerGame {...props}/>}/>
         </div>
         </HashRouter>
     );
