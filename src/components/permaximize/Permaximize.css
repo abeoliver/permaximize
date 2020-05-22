@@ -1,6 +1,101 @@
 #permaximize-main {
-
     --gradient: linear-gradient(45deg, var(--primary) 30%, var(--secondary) 70%);
     --secondary-gradient: linear-gradient(45deg, var(--primary) 42%, var(--secondary) 58%);
     --light-gradient: linear-gradient(45deg, var(--primary-light) 42%, var(--secondary-light) 58%);
+}
+
+/************** Title Screen **************/
+.permaximize-title-screen {
+    justify-content: center;
+}
+
+#permaximize-title-main {
+    position: fixed;
+    width: 8em;
+    left: 50vw;
+    top: 15vh;
+    margin: 1em -4em;
+    font-size: 4.5em;
+    color: var(--primary);
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+@media (max-width: 960px) {
+    #permaximize-title-main {
+        font-size: 3em;
+        top: 25vh;
+    }
+}
+
+#permaximize-title-author {
+    position: fixed;
+    width: 10em;
+    left: 50vw;
+    top: 40vh;
+    margin: 1em -5em;
+    font-size: 2em;
+    color: var(--primary);
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+@media (max-width: 960px) {
+    #permaximize-title-author {
+        font-size: 1.5em;
+        top: 35vh;
+    }
+}
+
+#permaximize-title-play {
+    position: fixed;
+    width: 6em;
+    left: 50vw;
+    top: 50vh;
+    margin: 1em -3.25em;
+    /* Text */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 2em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Border */
+    border: 10px solid;
+    border-image-source: var(--gradient);
+    border-image-slice: 1;
+    padding: .1em 0;
+}
+@media (max-width: 960px) {
+    #permaximize-title-play {
+        top: 40vh;
+        width: 7em;
+        margin: 1em -3.75em;
+    }
+}
+
+/* Hover effect if not on mobile */
+@media (min-width: 960px) {
+    .permaximize-title-screen-hover {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        background: var(--gradient);
+    }
+
+    .permaximize-title-screen-hover #permaximize-title-main,
+    .permaximize-title-screen-hover #permaximize-title-author {
+        color: white;
+        background: none;
+        -webkit-background-clip: inherit;
+        -webkit-text-fill-color: white;
+    }
+
+    .permaximize-title-screen-hover #permaximize-title-play {
+        color: white;
+        border: 10px solid white;
+        background: none;
+        -webkit-background-clip: inherit;
+        -webkit-text-fill-color: white;
+    }
 }

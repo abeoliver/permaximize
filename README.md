@@ -1,8 +1,6 @@
 # Todo
- - Write documentation
  - Deploy (maybe www.abeoliver.com)
  - Create multiplayer screen
- - Bundle screens with main components
  - Edit main screen for more buttons
     - Maybe multiplayer disappears?
  - Animations

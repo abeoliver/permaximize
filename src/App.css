@@ -11,4 +11,15 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
+  padding: 0;
+}
+
+.app-grid {
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.app-grid-item {
+  padding: 0;
 }

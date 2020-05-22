@@ -50,7 +50,7 @@ class SocketServer {
     // Once game is retrieved, add socket to game and send game data to client
     this.getGame(data.id).then((game) => {
       // Error handle
-      if (!game) {
+      if (!game || this.games[data.id] === undefined) {
         console.log("COULDN'T FIND A GAME");
         //socket.emit("error", "Couldn't find game");
         return;
