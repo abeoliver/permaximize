@@ -12,9 +12,9 @@
  */
 
 import React from 'react';
+import { Link } from "react-router-dom";
 import { LinearProgress, Button, Hidden } from "@material-ui/core";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-import { HelpScreen } from './Screens';
 import './BasicGame.css';
 
 const gameUtil = require("./game_util");
@@ -231,36 +231,49 @@ export class BasicGame extends React.Component {
   }
 
   /****** RENDERS ******/
+
+  playerText(player, over) {
+    let pText = "Player " + player;
+    if (over) {
+      pText = (this.winningPlayer() === player ? "Winner" : "Play again!");
+    }
+    return pText;
+  }
+
   /*
    * scoreHeader
    */
   scoreHeader() {
     // If game is over, show GAME OVER
     let over = this.state.turn >= this.maxTurn;
+    let p1Text = this.playerText(1, over);
+    let p2Text = this.playerText(2, over);
     return (
         <div className="game-score-header" onClick={(over ? this.resetState : null)}>
           <div className="game-win-winner-container" style={{marginRight: "1em"}}>
-            <p id="game-win-winner"
-               style={{visibility: (over ? "visible" : "hidden"),
-                 color: "var(--primary)"}}>
-              {this.winningPlayer() === 1 ? "Winner" : "Play again!"}
-            </p>
-            <p className={"game-score " + (this.currentPlayer() === 1 && !over ? "game-score-current" : "")}
+            <div className={"game-score " + (this.currentPlayer() === 1 && !over ? "game-score-current" : "")}
                id="game-score-1">
-              {this.state.score[0]}
-            </p>
+              <p id="game-score-overtext"
+                 style={{color: "var(--primary)"}}>
+                {p1Text}
+              </p>
+              <p className="game-score-text">
+                {this.state.score[0]}
+              </p>
+            </div>
           </div>
 
           <div className="game-win-winner-container">
-            <p id="game-win-winner"
-               style={{visibility: (over ? "visible" : "hidden"),
-                 color: "var(--secondary)"}}>
-              {this.winningPlayer() === 2 ? "Winner" : "Play again!"}
-            </p>
-            <p className={"game-score " + (this.currentPlayer() === 2 && !over ? "game-score-current" : "")}
+            <div className={"game-score " + (this.currentPlayer() === 2 && !over ? "game-score-current" : "")}
                id="game-score-2">
-              {this.state.score[1]}
-            </p>
+              <p id="game-score-overtext"
+                 style={{color: "var(--secondary)"}}>
+                {p2Text}
+              </p>
+              <p className="game-score-text">
+                {this.state.score[1]}
+              </p>
+            </div>
           </div>
         </div>
     );
@@ -286,7 +299,21 @@ export class BasicGame extends React.Component {
   }
 
   helpScreen() {
-    return <HelpScreen onClick={() => this.setState({showHelp: false})}/>;
+    const helpText = `
+      Welcome to Permaximize! To start, grab a friend and choose who will be blue (plays first)
+      and who will be pink. Each player has 7 turns to build the largest continuous blob of their
+      color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
+      opponent's pieces to swap. Once they have swapped the two, the piece of their own is now
+      "solidified" and cannot be moved for the rest of the game; these pieces are marked with a hollow center.
+       Use solidified pieces to cut your opponents blob and fortify your own!
+    `;
+    return (
+        <div id="game-help-main">
+          <h2 id="game-help-title">Permaximize</h2>
+          <p>{helpText}</p>
+          <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Got it </h3>
+        </div>
+    );
   }
 
   render() {
@@ -294,10 +321,15 @@ export class BasicGame extends React.Component {
       return (
           <div id="game-container">
             <Hidden mdDown>
-              <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>Help</Button>
+              <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>?</Button>
             </Hidden>
-            <h1 id="game-main-title">Permaximize</h1>
-            <h4 id="game-main-title-author">Abraham Oliver</h4>
+            <Link to="/" style={{textDecoration: "none"}}>
+              <p id="game-main-title">Permaximize</p>
+            </Link>
+
+            <p id="game-main-msg">
+              {this.state.msg !== "" ? this.state.msg : " "}
+            </p>
 
             <div className="game">
               {this.scoreHeader()}

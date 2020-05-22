@@ -1,25 +1,15 @@
 /*
- * PermaximizeGame.js - Permaximize Online
+ * Permaximize.jsx - Permaximize Online
  * Abraham Oliver, 2020
- *
- * Board status key:
- * 1 : Player 1 normal
- * 2 : Player 2 normal
- * 3 : Player 1 solid
- * 4 : Player 2 solid
- * 5 : Player 1 selected
- * 6 : Player 2 selected
  */
 
 import React from 'react';
-import {HashRouter, Route} from "react-router-dom";
-import { TitleScreen } from './Screens';
+import {HashRouter, Link, Route} from "react-router-dom";
 import { BasicGame } from './BasicGame';
 import { MultiplayerGame } from "./Multiplayer";
 import './Permaximize.css';
 import { themes } from "./themes";
 
-/* Main App Container with Title, Game, and Help dialogues */
 export class Permaximize extends React.Component {
   constructor(props) {
     super(props);
@@ -49,6 +39,33 @@ export class Permaximize extends React.Component {
                 render={props => <MultiplayerGame {...props}/>}/>
         </div>
         </HashRouter>
+    );
+  }
+}
+
+
+class TitleScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hovered: false};
+    this.hover = () => this.setState({hovered: true});
+    this.unHover = () => this.setState({hovered: false});
+  }
+
+
+  render() {
+    return (
+        <div className={"permaximize-title-screen" + (this.state.hovered ? " permaximize-title-screen-hover" : "")}>
+          <h1 id="permaximize-title-main">Permaximize</h1>
+          <h3 id="permaximize-title-author">by Abraham Oliver</h3>
+          <Link to="/permaximize/game" style={{textDecoration: "none"}}>
+            <h3 id="permaximize-title-play"
+                onMouseEnter={this.hover}
+                onMouseLeave={this.unHover}>
+              Play Now
+            </h3>
+          </Link>
+        </div>
     );
   }
 }

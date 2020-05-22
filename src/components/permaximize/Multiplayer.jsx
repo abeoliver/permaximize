@@ -8,6 +8,7 @@ import io from "socket.io-client";
 
 const urlBase = "http://localhost";
 const hashBase = "/permaximize/game/multiplayer/";
+const port = 3001;
 
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
@@ -23,7 +24,7 @@ export class MultiplayerGame extends BasicGame {
 
   componentDidMount() {
     // Create socket connection
-    this.socket = io.connect(urlBase + ":3001", {transports: ['websocket']});
+    this.socket = io.connect(urlBase + ":" + port, {transports: ['websocket']});
     // Set event handlers
     this.socket.on("connect", this.onConnect.bind(this));
     this.socket.on("game-state", this.onGameState.bind(this));
