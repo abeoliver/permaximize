@@ -1,4 +1,0 @@
-1. Player 1 creates a socket with the server and requests a new game
-    1. Connects
-    2. Sends request for new game
-2. Server creates game and sends data to client (including link to send other player)

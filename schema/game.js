@@ -1,5 +1,7 @@
-"use strict";
-
+/*
+ * Schema: Game - Permaximize Online
+ * Abraham Oliver, 2020
+ */
 const mongoose = require("mongoose");
 
 const gameUtil = require("../src/components/permaximize/game_util");
@@ -17,7 +19,7 @@ let gameSchema = new mongoose.Schema({
   }
 });
 
-// Add toSend method
+// Add toSend method (for sending game data across sockets)
 gameSchema.methods.toSend = function () {
   return JSON.stringify({
     id: this._id,

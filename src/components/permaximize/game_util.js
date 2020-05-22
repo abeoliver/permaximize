@@ -1,8 +1,12 @@
 /*
+ * game_util.js - Permaximize Online
+ * Abraham Oliver, 2020
+ */
+
+/*
  * initialBoard
  * Create the initial board state array
  */
-
 function initialBoard(size) {
   let board = [];
   for (let i = 0; i < size; i++) {

@@ -1,9 +1,8 @@
 /*
- * Multiplayer.js - Permaximize Online
+ * Multiplayer.jsx - Permaximize Online
  * Abraham Oliver, 2020
  */
 
-//import React from 'react';
 import { BasicGame } from "./BasicGame";
 import io from "socket.io-client";
 
@@ -13,22 +12,22 @@ const hashBase = "/permaximize/game/multiplayer/";
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
     super(props);
+    // Read player from URL
     this.player = parseInt(props.match.params.player);
-    //
+    // Match the game id if it is present in the URL
     this.id = null;
     if (props.match.params.id !== undefined) {
       this.id = props.match.params.id;
     }
-    this.onConnect = this.onConnect.bind(this);
-    this.onGameState = this.onGameState.bind(this);
   }
 
   componentDidMount() {
     // Create socket connection
     this.socket = io.connect(urlBase + ":3001", {transports: ['websocket']});
     // Set event handlers
-    this.socket.on("connect", this.onConnect);
-    this.socket.on("game-state", this.onGameState);
+    this.socket.on("connect", this.onConnect.bind(this));
+    this.socket.on("game-state", this.onGameState.bind(this));
+    this.socket.on("disconnect", () => console.log("DISCONNECTED FROM SOCKET SERVER"));
 
     super.componentDidMount();
   }
@@ -37,6 +36,7 @@ export class MultiplayerGame extends BasicGame {
     this.socket.close();
   }
 
+  // Override to prevent playing as other player
   allowClick(row, col) {
     // Do not allow clicking if game is over
     if (this.state.turn >= this.maxTurn) return false;
@@ -48,6 +48,7 @@ export class MultiplayerGame extends BasicGame {
   }
 
   executeMove(move, selected) {
+    // Play the move on the board
     super.executeMove(move, selected);
     // Send move to server
     this.socket.emit("game-update", JSON.stringify({
@@ -57,22 +58,26 @@ export class MultiplayerGame extends BasicGame {
     }), () => null); // Add acknowledgment as third argument
   }
 
-  onConnect(event) {
+  onConnect() {
     console.log("CONNECTED TO SOCKET SERVER");
-    // Find already built game
-    if (this.id !== "new") {
+    // Find already built game if client provided ID
+    if (this.id !== null && this.id !== "new") {
+      // Send a join game event
       this.socket.emit("join-game", JSON.stringify({
         id: this.id,
         player: this.player
       }), (data) => {
+        // Set the state of the game based on the server's response
         this.onGameState(data);
       });
       return;
     }
     // Otherwise, request a new game
     this.socket.emit('new-game', "", (data) => {
+      // Get ID from new game and put it into URL fragment in case user reloads
       this.id = JSON.parse(data).id;
       window.location.hash = hashBase + this.player + "/" + this.id;
+      // Set game state based on response
       this.onGameState(data);
     });
   }
