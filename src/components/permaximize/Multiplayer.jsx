@@ -3,10 +3,12 @@
  * Abraham Oliver, 2020
  */
 
+import React from "react";
 import { BasicGame } from "./BasicGame";
 import io from "socket.io-client";
+import "./BasicGame.css";
 
-const urlBase = "http://localhost";
+const urlBase = "http://10.0.0.131";
 const hashBase = "/permaximize/game/multiplayer/";
 const port = 3001;
 
@@ -16,9 +18,9 @@ export class MultiplayerGame extends BasicGame {
     // Read player from URL
     this.player = parseInt(props.match.params.player);
     // Match the game id if it is present in the URL
-    this.id = null;
+    this.idProp = null;
     if (props.match.params.id !== undefined) {
-      this.id = props.match.params.id;
+      this.idProp = props.match.params.id;
     }
   }
 
@@ -31,6 +33,10 @@ export class MultiplayerGame extends BasicGame {
     this.socket.on("disconnect", () => console.log("DISCONNECTED FROM SOCKET SERVER"));
 
     super.componentDidMount();
+
+    // Set ID in state
+    console.log("CHANGE ID STATE");
+    if (this.idProp !== null) this.setState({id: this.idProp});
   }
 
   componentWillUnmount() {
@@ -53,7 +59,7 @@ export class MultiplayerGame extends BasicGame {
     super.executeMove(move, selected);
     // Send move to server
     this.socket.emit("game-update", JSON.stringify({
-      id: this.id,
+      id: this.state.id,
       board: this.state.board,
       turn: this.state.turn + 1
     }), () => null); // Add acknowledgment as third argument
@@ -62,10 +68,10 @@ export class MultiplayerGame extends BasicGame {
   onConnect() {
     console.log("CONNECTED TO SOCKET SERVER");
     // Find already built game if client provided ID
-    if (this.id !== null && this.id !== "new") {
+    if (this.state.id !== null && this.state.id !== "new") {
       // Send a join game event
       this.socket.emit("join-game", JSON.stringify({
-        id: this.id,
+        id: this.state.id,
         player: this.player
       }), (data) => {
         // Set the state of the game based on the server's response
@@ -76,8 +82,8 @@ export class MultiplayerGame extends BasicGame {
     // Otherwise, request a new game
     this.socket.emit('new-game', "", (data) => {
       // Get ID from new game and put it into URL fragment in case user reloads
-      this.id = JSON.parse(data).id;
-      window.location.hash = hashBase + this.player + "/" + this.id;
+      this.setState({id: JSON.parse(data).id});
+      window.location.hash = hashBase + this.player + "/" + this.state.id;
       // Set game state based on response
       this.onGameState(data);
     });
@@ -90,8 +96,58 @@ export class MultiplayerGame extends BasicGame {
     this.updateScore();
   }
 
+  playerText(player, over) {
+    let pText = null;
+    if (player === this.player) {
+      pText = "You";
+    } else {
+      pText = "Opponent";
+    }
+    if (over) {
+      pText = (this.winningPlayer() === player ? "Winner" : "Play again!");
+    }
+    return pText;
+  }
+
+  copyLinkToClipboard() {
+    var range = document.createRange();
+    var selection = window.getSelection();
+    range.selectNodeContents(document.getElementById("multiplayer-link"));
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand("copy");
+  }
+
+  helpScreen() {
+    return (
+        <div id="game-help-main">
+          <h2 id="game-help-title">Permaximize</h2>
+          <p>Welcome to Permaximize Multiplayer!
+            {this.player === 1 ? <b> To start, send the link below to a friend. You are player one (blue) and you play first.</b> :
+                <b> An opponent has challenged you to a game. You are player two (pink) and you play second.</b>}
+            Each player has 7 turns to build the largest continuous blob of their color, without diagonals, which is displayed in a darker color.
+            On a given player's turn, they choose one of their own pieces and choose one of their opponent's pieces to swap. Once they have swapped
+            the two, the piece of their own color is now "solidified" and cannot be moved for the rest of the game; these pieces are marked with a
+            hollow center. Use solidified pieces to cut your opponents blob and fortify your own!</p>
+          {this.state.id !== null && this.state.id !== "new" ?
+              <div>
+                <p id="multiplayer-link" onClick={this.copyLinkToClipboard}>
+                  {urlBase + ":" + port + "/#/permaximize/game/multiplayer/2/" + this.state.id}
+                </p>
+                <p id="multiplayer-link-copy">(click link to copy)</p>
+                <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Play </h3>
+              </div> :
+              <p id="multiplayer-link">Connecting to server...</p>
+          }
+
+        </div>
+    );
+  }
+
+  linkContextExt = "/#/permaximize/game/multiplayer/1/new";
+
   render() {
-    if (this.id === null || this.player === null) {
+    if (this.state.id === null || this.state.id === "new" || this.player === null) {
       return this.helpScreen();
     } else {
       return super.render();

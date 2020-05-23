@@ -20,7 +20,7 @@
 }
 @media (max-width: 960px) {
     #game-main-title {
-        margin-top: 1em;
+        margin-top: .3em;
         margin-bottom: .2em;
         font-size: 3em;
     }
@@ -98,11 +98,13 @@
     margin-bottom: .1em;
     font-size: 1em;
     font-weight: bold;
+    min-width: 1.5em;
 }
 @media (max-width: 960px) {
     .game-score {
         font-size: 1.5em;
         border-radius: 10%;
+        min-width: 20vw;
     }
 }
 
@@ -145,7 +147,7 @@
 /************** Help Screen **************/
 #game-help-main {
     position: fixed;
-    top: 5vh;
+    top: 3vh;
     left: 25vw;
     width: 50vw;
     border: 10px solid;
@@ -171,7 +173,7 @@
 
 #game-help-done {
     width: 5em;
-    margin: 1em auto;
+    margin: .5em auto;
     text-decoration: none;
     font-weight: bold;
     background: var(--gradient);
@@ -264,6 +266,25 @@
 /* Player 2 Selected & Largest */
 .game-piece-status-6.game-piece-largest-2 {
     background-color: var(--secondary-dark);
+}
+
+/***** MULTIPLAYER *****/
+#multiplayer-link {
+    font-size: .8em;
+    max-width: 45vw;
+    overflow-wrap: break-word;
+    margin: 20px auto 5px auto;
+    font-weight: bold;
+}
+
+#multiplayer-link-copy {
+    font-size: .6em;
+    margin: 0;
+}
+@media (max-width: 960px) {
+    #multiplayer-link-copy {
+        margin-bottom: 20px;
+    }
 }
 
 

@@ -19,15 +19,16 @@
     "react-scripts": "3.4.1",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
+    "webpack-cli": "^3.3.11",
     "ws": "^7.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
     "build:w": "react-scripts build --watch",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "aws s3 sync build/ s3://abeoliver.com --acl public-read",
+    "deploy": "react-scripts build && aws s3 sync build/ s3://abeoliver.com --acl public-read",
     "lint": "node_modules/.bin/eslint src/*.js src/components/*/*.jsx"
   },
   "eslintConfig": {
@@ -44,5 +45,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "webpack-merge": "^4.2.2"
   }
 }

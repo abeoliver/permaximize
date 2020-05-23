@@ -19,6 +19,9 @@ import './BasicGame.css';
 
 const gameUtil = require("./game_util");
 
+const urlBase = "http://localhost";
+const port = 3001;
+
 function getTheme(player) {
   let docStyles = getComputedStyle(document.getElementById("permaximize-main"));
   const player1 = {
@@ -59,7 +62,8 @@ export class BasicGame extends React.Component {
       score: [0, 0],
       turn: 0,
       showHelp: true,
-      msg: ""
+      msg: "",
+      id: null,
     };
     this.searched = null;
     this._searchCount = this._searchCount.bind(this);
@@ -77,7 +81,8 @@ export class BasicGame extends React.Component {
       score: [1, 1],
       turn: 0,
       showHelp: showHelp,
-      msg: ""
+      msg: "",
+      id: null
     };
   };
 
@@ -299,22 +304,21 @@ export class BasicGame extends React.Component {
   }
 
   helpScreen() {
-    const helpText = `
-      Welcome to Permaximize! To start, grab a friend and choose who will be blue (plays first)
-      and who will be pink. Each player has 7 turns to build the largest continuous blob of their
-      color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
-      opponent's pieces to swap. Once they have swapped the two, the piece of their own is now
-      "solidified" and cannot be moved for the rest of the game; these pieces are marked with a hollow center.
-       Use solidified pieces to cut your opponents blob and fortify your own!
-    `;
     return (
         <div id="game-help-main">
           <h2 id="game-help-title">Permaximize</h2>
-          <p>{helpText}</p>
-          <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Got it </h3>
+          <p>Welcome to Permaximize! To start, grab a friend and choose who will be <b>blue</b> (plays first)
+            and who will be pink. Each player has 7 turns to build the largest continuous blob of their
+            color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
+            opponent's pieces to swap. Once they have swapped the two, the piece of their own is now
+            "solidified" and cannot be moved for the rest of the game; these pieces are marked with a hollow center.
+            Use solidified pieces to cut your opponents blob and fortify your own!</p>
+          <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Play </h3>
         </div>
     );
   }
+
+  linkContextExt = "/#/";
 
   render() {
     if (!this.state.showHelp) {
@@ -323,9 +327,9 @@ export class BasicGame extends React.Component {
             <Hidden mdDown>
               <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>?</Button>
             </Hidden>
-            <Link to="/" style={{textDecoration: "none"}}>
+            <div onClick={() => window.location = urlBase + ":" + port + this.linkContextExt}>
               <p id="game-main-title">Permaximize</p>
-            </Link>
+            </div>
 
             <p id="game-main-msg">
               {this.state.msg !== "" ? this.state.msg : " "}

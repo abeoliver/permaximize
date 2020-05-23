@@ -7,8 +7,8 @@ function App() {
   return (
       <div className="App">
         <header className="App-header">
-          <Grid container spacing={8} class="app-grid">
-            <Grid item xs={12} class="app-grid-item">
+          <Grid container spacing={8} className="app-grid">
+            <Grid item xs={12} className="app-grid-item">
               <Permaximize/>
             </Grid>
           </Grid>
