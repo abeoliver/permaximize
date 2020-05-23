@@ -10,6 +10,7 @@
 }
 
 #game-main-title {
+    font-weight: bold;
     font-size: 2em;
     background: var(--secondary-gradient);
     -webkit-background-clip: text;
@@ -19,23 +20,21 @@
 }
 @media (max-width: 960px) {
     #game-main-title {
-        margin-top: 1em;
+        margin-top: .3em;
         margin-bottom: .2em;
         font-size: 3em;
     }
 }
 
-#game-main-title-author {
-    font-size: 1em;
-    margin-top: 0;
-    margin-bottom: 0;
-    background: var(--secondary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+#game-main-msg {
+    font-weight: bold;
+    color: var(--secondary-text);
+    margin: .25em auto;
+    height: 2vh;
 }
 @media (max-width: 960px) {
-    #game-main-title-author {
-        margin-bottom: 1.4em;
+    #game-main-msg {
+        margin-top: 1.25em;
     }
 }
 
@@ -79,12 +78,14 @@
     font-size: 2em;
     align-items: baseline;
     height: 3.5em;
-    margin-top: 0;
+    margin-top: .5em;
+    margin-bottom: -.3em;
     max-height: 2.5em;
 }
 @media (max-width: 960px) {
     .game-score-header {
-        margin-bottom: .75em;
+        margin-bottom: 1em;
+        margin-top: 1em;
     }
 }
 
@@ -92,23 +93,28 @@
 .game-score {
     padding: .1em .35em;
     border: 10px solid white !important;
-    border-radius: 30%;
+    border-radius: 15%;
     margin-top: -.25em;
     margin-bottom: .1em;
-    font-size: 1.17em;
+    font-size: 1em;
     font-weight: bold;
+    min-width: 1.5em;
 }
 @media (max-width: 960px) {
     .game-score {
         font-size: 1.5em;
         border-radius: 10%;
+        min-width: 20vw;
     }
+}
+
+.game-score-text {
+    margin: 0 auto;
 }
 
 #game-score-1 {
     color: var(--primary);
     border-color: var(--primary);
-    /* margin-right: 2em; */
 }
 
 #game-score-2 {
@@ -118,24 +124,16 @@
 
 /* Current player indicator */
 .game-score-current {
-    padding: .1em .35em;
+    padding: .05em .2em;
     border: 10px solid !important;
-    border-radius: 30%;
+    border-radius: 15%;
 }
 
-/* Post-game text */
-.game-score-header-win {
-    height: 2.5em;
-    display: block;
-    margin-bottom: 10px;
-}
-
-
-#game-win-winner {
+#game-score-overtext {
     font-size: .4em;
     font-weight: bold;
     margin-bottom: 0;
-    margin-top: .5em;
+    margin-top: .2em;
     z-index: 100;
 }
 
@@ -146,34 +144,54 @@
     align-items: center;
 }
 
-.game-win-text {
-    margin: auto 20px auto 30px;
-    font-weight: bold;
+/************** Help Screen **************/
+#game-help-main {
+    position: fixed;
+    top: 3vh;
+    left: 25vw;
+    width: 50vw;
+    border: 10px solid;
+    border-image-source: var(--gradient);
+    border-image-slice: 1;
+    background: white;
+    padding: 1em 1em .3em 1em;
     color: var(--secondary-text);
 }
-
-.game-win-text-1 {
-    color: var(--primary);
+@media (max-width: 960px) {
+    #game-help-main {
+        top: 5vh;
+        left: 20vw;
+        font-size: .8em;
+    }
 }
 
-.game-win-text-2 {
-    color: var(--secondary);
+#game-help-title {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 0;
 }
 
-.game-win-link {
+#game-help-done {
+    width: 5em;
+    margin: .5em auto;
+    text-decoration: none;
     font-weight: bold;
-    font-size: .35em;
-    margin: 0;
-    color: var(--secondary-text);
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.25em;
+    border: 5px solid;
+    border-image-source: var(--gradient);
+    border-image-slice: 1;
+    padding: 0 0;
+}
+@media (max-width: 960px) {
+    #game-help-done {
+        width: 6em;
+    }
 }
 
-.game-win-link-1 {
-    color: var(--primary);
-}
-
-.game-win-link-2 {
-    color: var(--secondary);
-}
 
 /************** Game Pieces **************/
 .game-piece {
@@ -194,16 +212,19 @@
     background-color: var(--secondary-light);
 }
 
-/* Player 1 Solid */
+/* Player 1 & 2 Solid */
 .game-piece-status-3 {
     background-color: white;
     border: 15px solid var(--primary-light);
 }
-
-/* Player 2 Solid */
 .game-piece-status-4 {
     background-color: white;
     border: 15px solid var(--secondary-light);
+}
+@media (max-width: 960px) {
+    .game-piece-status-3, .game-piece-status-4 {
+        border-width: 10px;
+    }
 }
 
 /* Player 1 Selected */
@@ -246,6 +267,25 @@
 /* Player 2 Selected & Largest */
 .game-piece-status-6.game-piece-largest-2 {
     background-color: var(--secondary-dark);
+}
+
+/***** MULTIPLAYER *****/
+#multiplayer-link {
+    font-size: .6em;
+    max-width: 45vw;
+    overflow-wrap: break-word;
+    margin: 20px auto 5px auto;
+    font-weight: bold;
+}
+
+#multiplayer-link-copy {
+    font-size: .6em;
+    margin: 0;
+}
+@media (max-width: 960px) {
+    #multiplayer-link-copy {
+        margin-bottom: 20px;
+    }
 }
 
 

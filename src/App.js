@@ -1,15 +1,14 @@
 import React from 'react';
 import {Grid} from '@material-ui/core';
 import {Permaximize} from './components/permaximize/Permaximize';
-import { NetTest } from './components/permaximize/Multiplayer';
 import './App.css';
 
 function App() {
   return (
       <div className="App">
         <header className="App-header">
-          <Grid container spacing={8}>
-            <Grid item xs={12}>
+          <Grid container spacing={8} className="app-grid">
+            <Grid item xs={12} className="app-grid-item">
               <Permaximize/>
             </Grid>
           </Grid>

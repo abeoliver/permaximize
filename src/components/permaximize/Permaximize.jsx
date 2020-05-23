@@ -1,25 +1,15 @@
 /*
- * PermaximizeGame.js - Permaximize Online
+ * Permaximize.jsx - Permaximize Online
  * Abraham Oliver, 2020
- *
- * Board status key:
- * 1 : Player 1 normal
- * 2 : Player 2 normal
- * 3 : Player 1 solid
- * 4 : Player 2 solid
- * 5 : Player 1 selected
- * 6 : Player 2 selected
  */
 
 import React from 'react';
-import {HashRouter, Route} from "react-router-dom";
-import { TitleScreen } from './Screens';
-import { Game } from './Game';
+import {HashRouter, Link, Route} from "react-router-dom";
+import { BasicGame } from './BasicGame';
 import { MultiplayerGame } from "./Multiplayer";
 import './Permaximize.css';
 import { themes } from "./themes";
 
-/* Main App Container with Title, Game, and Help dialogues */
 export class Permaximize extends React.Component {
   constructor(props) {
     super(props);
@@ -42,13 +32,50 @@ export class Permaximize extends React.Component {
             <TitleScreen/>
           </Route>
           <Route exact path="/permaximize/game">
-            <Game/>
+            <BasicGame/>
           </Route>
-          <Route path="/permaximize/game/multiplayer">
-            <MultiplayerGame/>
-          </Route>
+          {/* NEED ROUTE TO MULTIPLAYER CREATION*/}
+          <Route path="/permaximize/game/multiplayer/:player/:id"
+                render={props => <MultiplayerGame {...props}/>}/>
         </div>
         </HashRouter>
+    );
+  }
+}
+
+
+class TitleScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hovered: false};
+    this.hover = () => this.setState({hovered: true});
+    this.unHover = () => this.setState({hovered: false});
+  }
+
+
+  render() {
+    return (
+        <div className={"permaximize-title-screen" + (this.state.hovered ? " permaximize-title-screen-hover" : "")}>
+          <h1 id="permaximize-title-main">Permaximize</h1>
+          <h3 id="permaximize-title-author">by Abraham Oliver</h3>
+          <div id="permaximize-title-buttons">
+            <Link to="/permaximize/game" style={{textDecoration: "none"}}>
+              <h3 className="permaximize-title-play"
+                  id="permaximize-title-play-1"
+                  onMouseEnter={this.hover}
+                  onMouseLeave={this.unHover}>
+                Play Local
+              </h3>
+            </Link>
+            <Link to="/permaximize/game/multiplayer/1/new" style={{textDecoration: "none"}}>
+              <h3 className="permaximize-title-play"
+                  onMouseEnter={this.hover}
+                  onMouseLeave={this.unHover}>
+                Play Online
+              </h3>
+            </Link>
+          </div>
+        </div>
     );
   }
 }
