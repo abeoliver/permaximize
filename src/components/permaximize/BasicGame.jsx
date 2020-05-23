@@ -306,13 +306,13 @@ export class BasicGame extends React.Component {
   helpScreen() {
     return (
         <div id="game-help-main">
-          <h2 id="game-help-title">Permaximize</h2>
+          <h2 id="game-help-title">Instructions</h2>
           <p>Welcome to Permaximize! To start, grab a friend and choose who will be <b>blue</b> (plays first)
             and who will be pink. Each player has 7 turns to build the largest continuous blob of their
             color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
-            opponent's pieces to swap. Once they have swapped the two, the piece of their own is now
+            opponent's pieces and swap them. Once they have swapped the two, the piece of their own color is now
             "solidified" and cannot be moved for the rest of the game; these pieces are marked with a hollow center.
-            Use solidified pieces to cut your opponents blob and fortify your own!</p>
+            Use solidified pieces to cut your opponents' blob and fortify your own!</p>
           <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Play </h3>
         </div>
     );

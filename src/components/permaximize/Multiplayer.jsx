@@ -122,14 +122,13 @@ export class MultiplayerGame extends BasicGame {
   helpScreen() {
     return (
         <div id="game-help-main">
-          <h2 id="game-help-title">Permaximize</h2>
-          <p>Welcome to Permaximize Multiplayer!
-            {this.player === 1 ? <b> To start, send the link below to a friend. You are player one (blue) and you play first.</b> :
-                <b> An opponent has challenged you to a game. You are player two (pink) and you play second.</b>}
+          <h2 id="game-help-title">Instructions</h2>
+          <p>{this.player === 1 ? <b>To start, send the link below to a friend. You are player one (blue) and you play first. </b> :
+                <b> An opponent has challenged you to a game. You are player two (pink) and you play second. </b>}
             Each player has 7 turns to build the largest continuous blob of their color, without diagonals, which is displayed in a darker color.
-            On a given player's turn, they choose one of their own pieces and choose one of their opponent's pieces to swap. Once they have swapped
+            On a given player's turn, they choose one of their own pieces and choose one of their opponent's pieces and swap them. Once they have swapped
             the two, the piece of their own color is now "solidified" and cannot be moved for the rest of the game; these pieces are marked with a
-            hollow center. Use solidified pieces to cut your opponents blob and fortify your own!</p>
+            hollow center. Use solidified pieces to cut your opponents' blob and fortify your own!</p>
           {(() => {
             if (this.state.id !== null && this.state.id !== "new") {
               let showLink = this.player === 1;
