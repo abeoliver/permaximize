@@ -9,6 +9,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "async": "^3.2.0",
+    "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "mongoose": "^5.9.15",
     "react": "^16.13.1",
@@ -22,9 +23,10 @@
     "webpack-cli": "^3.3.11",
     "ws": "^7.3.0"
   },
+  "proxy": "http://localhost:3001",
   "scripts": {
-    "start": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "build:w": "react-scripts build --watch",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

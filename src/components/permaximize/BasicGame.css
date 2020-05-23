@@ -154,7 +154,7 @@
     border-image-source: var(--gradient);
     border-image-slice: 1;
     background: white;
-    padding: 1em;
+    padding: 1em 1em .3em 1em;
     color: var(--secondary-text);
 }
 @media (max-width: 960px) {
@@ -169,6 +169,7 @@
     background: var(--gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    margin-top: 0;
 }
 
 #game-help-done {
@@ -270,7 +271,7 @@
 
 /***** MULTIPLAYER *****/
 #multiplayer-link {
-    font-size: .8em;
+    font-size: .6em;
     max-width: 45vw;
     overflow-wrap: break-word;
     margin: 20px auto 5px auto;

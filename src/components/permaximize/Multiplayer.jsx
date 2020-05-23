@@ -8,9 +8,10 @@ import { BasicGame } from "./BasicGame";
 import io from "socket.io-client";
 import "./BasicGame.css";
 
-const urlBase = "http://10.0.0.131";
+const urlBase = process.env.REACT_APP_URLBASE;
+const socketUrl = process.env.REACT_APP_SOCKET_URL;
 const hashBase = "/permaximize/game/multiplayer/";
-const port = 3001;
+const port = process.env.REACT_APP_PORT;
 
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
@@ -26,7 +27,8 @@ export class MultiplayerGame extends BasicGame {
 
   componentDidMount() {
     // Create socket connection
-    this.socket = io.connect(urlBase + ":" + port, {transports: ['websocket']});
+    this.socket = io.connect();
+    console.log(socketUrl);
     // Set event handlers
     this.socket.on("connect", this.onConnect.bind(this));
     this.socket.on("game-state", this.onGameState.bind(this));
@@ -35,7 +37,6 @@ export class MultiplayerGame extends BasicGame {
     super.componentDidMount();
 
     // Set ID in state
-    console.log("CHANGE ID STATE");
     if (this.idProp !== null) this.setState({id: this.idProp});
   }
 
@@ -129,17 +130,25 @@ export class MultiplayerGame extends BasicGame {
             On a given player's turn, they choose one of their own pieces and choose one of their opponent's pieces to swap. Once they have swapped
             the two, the piece of their own color is now "solidified" and cannot be moved for the rest of the game; these pieces are marked with a
             hollow center. Use solidified pieces to cut your opponents blob and fortify your own!</p>
-          {this.state.id !== null && this.state.id !== "new" ?
-              <div>
-                <p id="multiplayer-link" onClick={this.copyLinkToClipboard}>
-                  {urlBase + ":" + port + "/#/permaximize/game/multiplayer/2/" + this.state.id}
-                </p>
-                <p id="multiplayer-link-copy">(click link to copy)</p>
-                <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Play </h3>
-              </div> :
-              <p id="multiplayer-link">Connecting to server...</p>
-          }
-
+          {(() => {
+            if (this.state.id !== null && this.state.id !== "new") {
+              let showLink = this.player === 1;
+              return (
+                  <div>
+                    {showLink ?
+                        ([(<p id="multiplayer-link" onClick={this.copyLinkToClipboard}>
+                          {urlBase + (port !== "0" ? ":" + port : "") + "/#/permaximize/game/multiplayer/2/" + this.state.id}
+                        </p>),
+                          (<p id="multiplayer-link-copy">(click link to copy)</p>)]) :
+                        ""
+                    }
+                    <h3 id="game-help-done" onClick={() => this.setState({showHelp: false})}> Play </h3>
+                  </div>
+              );
+            } else {
+              return <p id="multiplayer-link">Connecting to server...</p>;
+            }
+          })()}
         </div>
     );
   }

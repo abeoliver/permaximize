@@ -58,13 +58,23 @@ class TitleScreen extends React.Component {
         <div className={"permaximize-title-screen" + (this.state.hovered ? " permaximize-title-screen-hover" : "")}>
           <h1 id="permaximize-title-main">Permaximize</h1>
           <h3 id="permaximize-title-author">by Abraham Oliver</h3>
-          <Link to="/permaximize/game" style={{textDecoration: "none"}}>
-            <h3 id="permaximize-title-play"
-                onMouseEnter={this.hover}
-                onMouseLeave={this.unHover}>
-              Play Now
-            </h3>
-          </Link>
+          <div id="permaximize-title-buttons">
+            <Link to="/permaximize/game" style={{textDecoration: "none"}}>
+              <h3 className="permaximize-title-play"
+                  id="permaximize-title-play-1"
+                  onMouseEnter={this.hover}
+                  onMouseLeave={this.unHover}>
+                Play Local
+              </h3>
+            </Link>
+            <Link to="/permaximize/game/multiplayer/1/new" style={{textDecoration: "none"}}>
+              <h3 className="permaximize-title-play"
+                  onMouseEnter={this.hover}
+                  onMouseLeave={this.unHover}>
+                Play Online
+              </h3>
+            </Link>
+          </div>
         </div>
     );
   }

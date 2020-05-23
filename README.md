@@ -1,15 +1,11 @@
 # Todo
  - Deploy (maybe www.abeoliver.com)
- - Create multiplayer screen
- - Edit main screen for more buttons
-    - Maybe multiplayer disappears?
  - Animations
- - UI message display
- - Always include score labels with "You" vs "Opponent"
+ - UI message display content
  - Computer player
  - Nav bar and title bar
  - Help button should be a question mark
-
+ - Multiplayer game restart
 # Socket Server API
 `
 GameSend {id, board, turn}

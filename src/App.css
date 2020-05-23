@@ -1,11 +1,11 @@
 .App {
   text-align: center;
+  height: 100vh !important;
+  width: 100vw !important;
 }
 
 .App-header {
   background-color: white;
-  height: 100vh;
-  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,14 +13,18 @@
   font-size: calc(10px + 2vmin);
   padding: 0;
   overflow: hidden;
+  height: 100vh !important;
+  width: 100vw !important;
 }
 
 .app-grid {
   padding: 0;
-  height: 100vh;
-  width: 100vw;
+  height: 100vh !important;
+  width: 100vw !important;
 }
 
 .app-grid-item {
-  padding: 0;
+  padding: 0 !important;
+  height: 100vh !important;
+  width: 100vw !important;
 }
