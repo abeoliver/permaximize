@@ -307,7 +307,7 @@ export class BasicGame extends React.Component {
     return (
         <div id="game-help-main">
           <h2 id="game-help-title">Instructions</h2>
-          <p>Welcome to Permaximize! To start, grab a friend and choose who will be <b>blue</b> (plays first)
+          <p>Welcome to Permaximize! To start, grab a friend and choose who will be blue (plays first)
             and who will be pink. Each player has 7 turns to build the largest continuous blob of their
             color, without diagonals, which is displayed in a darker color. On a given player's turn, they choose one of their own pieces and choose one of their
             opponent's pieces and swap them. Once they have swapped the two, the piece of their own color is now

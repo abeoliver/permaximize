@@ -62,7 +62,10 @@ export class MultiplayerGame extends BasicGame {
     this.socket.emit("game-update", JSON.stringify({
       id: this.state.id,
       board: this.state.board,
-      turn: this.state.turn + 1
+      turn: this.state.turn + 1,
+      move: move,
+      selected: selected,
+      score: this.state.score
     }), () => null); // Add acknowledgment as third argument
   }
 

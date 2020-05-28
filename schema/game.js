@@ -16,6 +16,20 @@ let gameSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
+  },
+  historyPiece1: {
+    type: [Number],
+    min: 0,
+    max: 48
+  },
+  historyPiece2 : {
+    type: [Number],
+    min: 0,
+    max: 48
+  },
+  result: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -27,6 +41,12 @@ gameSchema.methods.toSend = function () {
     turn: this.turn
   });
 };
+
+// Add a method to save game history moves
+gameSchema.methods.recordMove = function (move, selected) {
+  this.historyPiece1.push(selected[0] * 7 + selected[1]);
+  this.historyPiece2.push(move[0] * 7 + move[1]);
+}
 
 let Game = new mongoose.model("Game", gameSchema);
 

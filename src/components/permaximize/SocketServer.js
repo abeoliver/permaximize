@@ -89,6 +89,12 @@ class SocketServer {
     });
   }
 
+  result(score) {
+    if (score[0] === score[1]) return 0;
+    else if (score[0] > score[1]) return 1;
+    else return 2;
+  }
+
   onGameUpdate(data, acknowledgement, socket) {
     data = JSON.parse(data);
     // Get game record
@@ -102,6 +108,9 @@ class SocketServer {
       // Update game in database
       game.board = JSON.stringify(data.board);
       game.turn = data.turn;
+      game.recordMove(data.move, data.selected);
+      // Save current winning player for report score
+      game.result = this.result(data.score);
       game.save();
 
       // Send to other player
