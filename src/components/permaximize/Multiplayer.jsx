@@ -57,7 +57,7 @@ export class MultiplayerGame extends BasicGame {
 
   executeMove(move, selected) {
     // Play the move on the board
-    super.executeMove(move, selected);
+    let result = super.executeMove(move, selected);
     // Send move to server
     this.socket.emit("game-update", JSON.stringify({
       id: this.state.id,
@@ -65,7 +65,7 @@ export class MultiplayerGame extends BasicGame {
       turn: this.state.turn + 1,
       move: move,
       selected: selected,
-      score: this.state.score
+      score: result[1]
     }), () => null); // Add acknowledgment as third argument
   }
 
@@ -97,7 +97,7 @@ export class MultiplayerGame extends BasicGame {
     let gameState = JSON.parse(gameStateMsg);
     console.log(gameState);
     this.setState({board: gameState.board, turn: gameState.turn});
-    this.updateScore();
+    if (gameState.board) this.updateScore(gameState.board);
   }
 
   playerText(player, over) {

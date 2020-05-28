@@ -65,8 +65,6 @@ export class BasicGame extends React.Component {
       msg: "",
       id: null,
     };
-    this.searched = null;
-    this._searchCount = this._searchCount.bind(this);
   }
 
   componentDidMount() {
@@ -141,98 +139,16 @@ export class BasicGame extends React.Component {
     // Save updated game state
     this.setState({selected: null, board: newBoard, turn: this.state.turn + 1});
     // Update score
-    this.updateScore();
+    return this.updateScore(newBoard);
   }
 
   /*
    * updateScore
    */
-  updateScore() {
-    this.setState({score: [this.calculateScore(1), this.calculateScore(2)]});
-  }
-
-  /*
-   * recordLargestBlob
-   * Given one node of the largest user blob, record the location of the entire blob
-   */
-  recordLargestBlob(r, c, player) {
-    // Clear previous recorder
-    let largest = [...this.state.largest];
-    for (let i = 0; i < largest.length; i++) {
-      for (let j = 0; j < largest.length; j++) {
-        if (largest[i][j] === player) largest[i][j] = 0;
-      }
-    }
-    // Run recorder
-    this._recordLargestBlob(r, c, player, largest);
-    this.setState({largest: largest});
-  }
-
-  /*
-   * _recordLargestBlob
-   * Recursive recorder for recording largest blob
-   */
-  _recordLargestBlob(r, c, player, largest) {
-    // Base cases
-    if (r < 0 || c < 0 || r > this.size - 1 || c > this.size - 1) {
-      return;
-    } else if ((this.state.board[r][c] % 2) !== 2 - player || largest[r][c]) {
-      return;
-    }
-    // Mark searched
-    largest[r][c] = player;
-    // Search left, up, right, down
-    this._recordLargestBlob(r, c - 1, player, largest);
-    this._recordLargestBlob(r - 1, c, player, largest);
-    this._recordLargestBlob(r, c + 1, player, largest);
-    this._recordLargestBlob(r + 1, c, player, largest);
-
-  }
-
-  /*
-   * calculateScore
-   * Calculate largest chain for a given player
-   * Side effect: save largest to largest blob tracker
-   */
-  calculateScore(player) {
-    // Clear search array
-    this.searched = gameUtil.zeros(this.size);
-    let largest = [0, player - 1]
-    let maxSize = 0;
-    let count = 0;
-    for (let r = 0; r < this.size; r++) {
-      for (let c = 0; c < this.size; c++) {
-        count = this._searchCount(r, c, player)
-        if (count > maxSize) {
-          largest = [r, c];
-          maxSize = count;
-        }
-      }
-    }
-    // Record largest blob
-    if (maxSize > 1) {
-      this.recordLargestBlob(largest[0], largest[1], player);
-    }
-    return maxSize;
-  }
-
-  /*
-   * _searchCount
-   * Recursive search to count chains
-   * Do not call out of the context of calculateScore
-   */
-  _searchCount(row, col, player) {
-    // Base cases
-    if (row < 0 || col < 0 || row > this.size - 1 || col > this.size - 1) {
-      return 0;
-    } else if ((this.state.board[row][col] % 2) !== 2 - player || this.searched[row][col]) {
-      return 0;
-    }
-    // Mark searched
-    this.searched[row][col] = player;
-    // Search left, up, right, down
-    return 1 + this._searchCount(row, col - 1, player) + this._searchCount(row - 1, col, player) +
-        this._searchCount(row, col + 1, player) + this._searchCount(row + 1, col, player);
+  updateScore(board) {
+    let [blobs, score] = gameUtil.analyzeBoard(board);
+    this.setState({score: score, largest: blobs});
+    return [blobs, score];
   }
 
   /****** RENDERS ******/

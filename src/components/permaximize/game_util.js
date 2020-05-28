@@ -48,8 +48,8 @@ function flipPieces(board, selected, second) {
  * Find the largest blobs of each player and their sizes
  * Returns a tuple (largest blobs, score)
  */
-function analyzeBoard(player, board) {
-  let size = board.length();
+function analyzeBoard(board) {
+  let size = board.length;
   let searched = zeros(size);
   let largestBlobs = zeros(size);
   // Initial largest is top corner piece of player's color
@@ -101,8 +101,10 @@ function analyzeBoard(player, board) {
     recordBlobs(row, col + 1, player);
     recordBlobs(row + 1, col, player);
   }
-  recordBlobs(largest[0][0], largest[0][1], 1);
-  recordBlobs(largest[1][0], largest[1][1], 2);
+  if (maxSizes[0] > 1 || maxSizes[1] > 1) {
+    recordBlobs(largest[0][0], largest[0][1], 1);
+    recordBlobs(largest[1][0], largest[1][1], 2);
+  }
 
   return [largestBlobs, maxSizes];
 }
