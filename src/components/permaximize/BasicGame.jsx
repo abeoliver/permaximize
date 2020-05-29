@@ -84,7 +84,9 @@ export class BasicGame extends React.Component {
     };
   };
 
-  resetState = () => this.setState(this.initialState(false));
+  resetState() {
+    this.setState(this.initialState(false));
+  }
 
   currentPlayer = () => (this.state.turn % 2) + 1;
   opposingPlayer = () => this.currentPlayer() === 1 ? 2 : 1;
@@ -170,7 +172,7 @@ export class BasicGame extends React.Component {
     let p1Text = this.playerText(1, over);
     let p2Text = this.playerText(2, over);
     return (
-        <div className="game-score-header" onClick={(over ? this.resetState : null)}>
+        <div className="game-score-header" onClick={(over ? this.resetState.bind(this) : null)}>
           <div className="game-win-winner-container" style={{marginRight: "1em"}}>
             <div className={"game-score " + (this.currentPlayer() === 1 && !over ? "game-score-current" : "")}
                id="game-score-1">

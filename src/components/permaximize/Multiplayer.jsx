@@ -44,6 +44,11 @@ export class MultiplayerGame extends BasicGame {
     this.socket.close();
   }
 
+  resetState() {
+    // Request a new game
+    this.socket.emit('reset-multi-game', JSON.stringify({id: this.state.id, player: this.player}));
+  }
+
   // Override to prevent playing as other player
   allowClick(row, col) {
     // Do not allow clicking if game is over
@@ -93,11 +98,15 @@ export class MultiplayerGame extends BasicGame {
     });
   }
 
-  onGameState(gameStateMsg) {
-    let gameState = JSON.parse(gameStateMsg);
-    console.log(gameState);
-    this.setState({board: gameState.board, turn: gameState.turn});
-    if (gameState.board) this.updateScore(gameState.board);
+  onGameState(data) {
+    data = JSON.parse(data);
+    // Get ID from new game and put it into URL fragment in case user reloads
+    if (data.id !== this.state.id) {
+      window.location.hash = hashBase + this.player + "/" + data.id;
+      this.setState({id: data.id});
+    }
+    this.setState({board: data.board, turn: data.turn});
+    if (data.board) this.updateScore(data.board);
   }
 
   playerText(player, over) {

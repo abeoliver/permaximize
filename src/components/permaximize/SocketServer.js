@@ -26,6 +26,7 @@ class SocketServer {
       socket.on("message", this.onMessage.bind(this));
       socket.on('disconnect', this.onDisconnect.bind(this));
       socket.on('new-game', (d, a) => this.onNewGame.bind(this)(d, a, socket));
+      socket.on('reset-multi-game', (d, a) => this.onResetMultiGame.bind(this)(d, a, socket));
       socket.on("game-update", (d, a) => this.onGameUpdate.bind(this)(d, a, socket));
       socket.on("join-game", (d, a) => this.onJoinGame.bind(this)(d, a, socket));
     });
@@ -86,6 +87,37 @@ class SocketServer {
 
       // Acknowledge message with a game state
       acknowledgment(game.toSend());
+    });
+  }
+
+  onResetMultiGame(dataPacket, acknowledgment, socket) {
+    let {id, player} = JSON.parse(dataPacket);
+    player = parseInt(player);
+    // Get a new game
+    let newGameRecord = new GameRecord();
+    newGameRecord.save((err, game) => {
+      if (err) {
+        throw err;
+      }
+
+      // Add to server records
+      this.games[game._id] = {
+        id: game._id,
+        p1: player === 1 ? socket : this.games[id].p1,
+        p2: player === 2 ? socket : this.games[id].p2,
+      };
+
+      // Send new game to p1 if it is alive
+      if (this.games[id].p1 !== null && this.games[id].p1.connected) {
+        this.games[id].p1.emit("game-state", game.toSend());
+      }
+      // Send new game to p2 if it is alive
+      if (this.games[id].p2 !== null && this.games[id].p2.connected) {
+        this.games[id].p2.emit("game-state", game.toSend());
+      }
+
+      // Remove previous game
+      this.games[id] = undefined;
     });
   }
 

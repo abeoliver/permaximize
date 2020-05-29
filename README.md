@@ -1,11 +1,11 @@
 # Todo
  - Deploy (maybe www.abeoliver.com)
  - Animations
- - UI message display content
+ - UI message display content (half implemented)
  - Computer player
  - Nav bar and title bar
- - Help button should be a question mark
- - Multiplayer game restart
+ - Player is active/deactive indicator
+ - NOTIFICATIONS
 # Socket Server API
 `
 GameSend {id, board, turn}
@@ -20,6 +20,7 @@ Events:
  likely because the other player made a move. Formatted as `GameSend`.
  - `update-game` Sent from the client to the server when the player has made a change to the
  game. Sent as a `GameSend`.
+ - `reset-multi-game` Restart a multiplayer game and send a new state to both players
  
  # Database Schema
  ```$xslt
