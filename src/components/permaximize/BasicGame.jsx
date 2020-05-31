@@ -12,7 +12,6 @@
  */
 
 import React from 'react';
-import { Link } from "react-router-dom";
 import { LinearProgress, Button, Hidden } from "@material-ui/core";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import './BasicGame.css';
@@ -260,11 +259,20 @@ export class BasicGame extends React.Component {
                    style={{gridTemplateColumns: "repeat(" + this.size + ", auto)"}}>
                 {this.createBoardPieces()}
               </div>
-
-              <ThemeProvider theme={getTheme(this.currentPlayer())}>
-                <LinearProgress variant="determinate" value={(this.state.turn / this.maxTurn) * 100}
-                                className="game-progress-bar"/>
-              </ThemeProvider>
+              {(() => {
+                  if (this.state.turn === this.maxTurn - 2) {
+                    return <p id="game-progress-final-1">Player 1's final turn</p>;
+                  } else if (this.state.turn === this.maxTurn - 1) {
+                    return <p id="game-progress-final-2">Player 2's final turn</p>;
+                  } else if (this.state.turn < this.maxTurn - 2) {
+                    return (
+                        <ThemeProvider theme={getTheme(this.currentPlayer())}>
+                          <LinearProgress variant="determinate" value={(this.state.turn / this.maxTurn) * 100}
+                                          className="game-progress-bar"/>
+                        </ThemeProvider>
+                    );
+                  }
+                })()}
             </div>
           </div>
       );

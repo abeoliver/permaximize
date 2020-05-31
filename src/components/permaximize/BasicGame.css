@@ -63,6 +63,16 @@
     justify-content: center;
 }
 
+#game-progress-final-1 {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+#game-progress-final-2 {
+    font-weight: bold;
+    color: var(--secondary);
+}
+
 .game-board-grid {
     display: grid;
     align-items: center;
