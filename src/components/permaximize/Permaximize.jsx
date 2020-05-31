@@ -5,8 +5,9 @@
 
 import React from 'react';
 import {HashRouter, Link, Route} from "react-router-dom";
-import { BasicGame } from './BasicGame';
-import { MultiplayerGame } from "./Multiplayer";
+import BasicGame from './BasicGame';
+import MultiplayerGame from "./Multiplayer";
+import CpuGame from "./CpuGame";
 import './Permaximize.css';
 import { themes } from "./themes";
 
@@ -32,7 +33,7 @@ export class Permaximize extends React.Component {
             <TitleScreen/>
           </Route>
           <Route exact path="/permaximize/game">
-            <BasicGame/>
+            <CpuGame/>
           </Route>
           {/* NEED ROUTE TO MULTIPLAYER CREATION*/}
           <Route path="/permaximize/game/multiplayer/:player/:id"
@@ -73,7 +74,7 @@ class TitleScreen extends React.Component {
                   onMouseLeave={this.unHover}>
                 Play Online
               </h3>
-            </Link>
+            </Link>>
           </div>
         </div>
     );

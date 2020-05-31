@@ -49,7 +49,7 @@ function Piece(props) {
  * Game
  * Main game control component
  */
-export class BasicGame extends React.Component {
+export default class BasicGame extends React.Component {
   constructor(props) {
     super(props);
     this.size = 7;

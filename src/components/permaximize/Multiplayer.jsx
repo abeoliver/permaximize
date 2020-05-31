@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { BasicGame } from "./BasicGame";
+import BasicGame from "./BasicGame";
 import io from "socket.io-client";
 import "./BasicGame.css";
 
@@ -13,7 +13,7 @@ const socketUrl = process.env.REACT_APP_SOCKET_URL;
 const hashBase = "/permaximize/game/multiplayer/";
 const port = process.env.REACT_APP_PORT;
 
-export class MultiplayerGame extends BasicGame {
+export default class MultiplayerGame extends BasicGame {
   constructor(props) {
     super(props);
     // Read player from URL
@@ -57,7 +57,6 @@ export class MultiplayerGame extends BasicGame {
     if (((this.state.turn % 2) + 1) !== this.player) return false;
     // Do not choose a solid piece (return true otherwise)
     return !(this.state.board[row][col] === 3 || this.state.board[row][col] === 4);
-
   }
 
   executeMove(move, selected) {
