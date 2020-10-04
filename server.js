@@ -29,4 +29,4 @@ new Permaximize(server);
 
 // Run the server
 //process.argv[2]
-server.listen(3001, () => console.log("Server listening..."));
+server.listen(80, () => console.log("Server listening..."));

@@ -6,6 +6,11 @@
  - Nav bar and title bar
  - Player is active/deactive indicator
  - NOTIFICATIONS
+ 
+# Deployment
+```bash
+ ssh -i ~/Downloads/permaximize-aws-keys.pem ubuntu@ec2-18-188-214-9.us-east-2.compute.amazonaws.com
+```
 # Socket Server API
 `
 GameSend {id, board, turn}
