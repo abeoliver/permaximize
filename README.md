@@ -10,9 +10,9 @@
 # Deployment
 ```bash
  # Connect to EC2
- ssh -i ~/Downloads/permaximize-aws-keys.pem ubuntu@ec2-3-138-54-66.us-east-2.compute.amazonaws.com
+ ssh -i ~/keys/permaximize-server-west.pem ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
  # Port forward 9999 to mongodb
- ssh -i ~/Downloads/permaximize-aws-keys.pem -N -L 0.0.0.0:9999:127.0.0.1:27017 ubuntu@ec2-3-138-54-66.us-east-2.compute.amazonaws.com
+ ssh -i ~/keys/permaximize-server-west.pem -N -L 0.0.0.0:9999:127.0.0.1:27017 ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
 ```
 # Socket Server API
 `
