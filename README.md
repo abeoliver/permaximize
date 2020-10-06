@@ -5,7 +5,8 @@
  - Computer player
  - Nav bar and title bar
  - Player is active/deactive indicator
- - NOTIFICATIONS
+ - MongoDB URL in SocketServer put credentials in production file
+ - Redirect HTTP to HTTPS (Helmet?)
  
 # Deployment
 ```bash

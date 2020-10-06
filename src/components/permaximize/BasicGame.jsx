@@ -18,9 +18,6 @@ import './BasicGame.css';
 
 const gameUtil = require("./game_util");
 
-const urlBase = "http://localhost";
-const port = 3001;
-
 function getTheme(player) {
   let docStyles = getComputedStyle(document.getElementById("permaximize-main"));
   const player1 = {
@@ -244,7 +241,7 @@ export class BasicGame extends React.Component {
             <Hidden mdDown>
               <Button id="game-help-button" onClick={() => this.setState({showHelp: true})}>?</Button>
             </Hidden>
-            <div onClick={() => window.location = urlBase + ":" + port + this.linkContextExt}>
+            <div onClick={() => window.location.hash = ""}>
               <p id="game-main-title">Permaximize</p>
             </div>
 
