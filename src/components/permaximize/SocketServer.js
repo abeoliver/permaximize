@@ -4,11 +4,9 @@
  */
 const mongoose = require("mongoose");
 const sio = require("socket.io");
-
 const GameRecord = require("../../../schema/game");
 
 const mongoURL = "mongodb://abe:Tr%40bajabaDur0@localhost:27017/PermaximizeGames";
-//const mongoURL = "mongodb+srv://permaximize:Tr%40bajabaDur0@permaximize-vomg0.mongodb.net/Permaximize?retryWrites=true&w=majority"
 
 class SocketServer {
   constructor(server) {

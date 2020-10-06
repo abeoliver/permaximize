@@ -26,16 +26,22 @@
     }
 }
 
+#permaximize-message-block {
+    display: inline-flex;
+}
+@media (max-width: 960px) {
+    #game-main-msg {
+        margin-top: 1.25em;
+    }
+}
 #game-main-msg {
     font-weight: bold;
     color: var(--secondary-text);
     margin: .25em auto;
     height: 2vh;
 }
-@media (max-width: 960px) {
-    #game-main-msg {
-        margin-top: 1.25em;
-    }
+#permaximize-status-indicator {
+    margin: 15px 0 0 15px;
 }
 
 #game-help-button {

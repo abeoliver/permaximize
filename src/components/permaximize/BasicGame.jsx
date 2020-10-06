@@ -15,6 +15,7 @@ import React from 'react';
 import { LinearProgress, Button, Hidden } from "@material-ui/core";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import './BasicGame.css';
+import 'status-indicator/styles.css';
 
 const gameUtil = require("./game_util");
 
@@ -60,6 +61,7 @@ export class BasicGame extends React.Component {
       showHelp: true,
       msg: "",
       id: null,
+      opponent_active: true
     };
   }
 
@@ -76,7 +78,8 @@ export class BasicGame extends React.Component {
       turn: 0,
       showHelp: showHelp,
       msg: "",
-      id: null
+      id: null,
+      opponent_active: false
     };
   };
 
@@ -232,7 +235,9 @@ export class BasicGame extends React.Component {
     );
   }
 
-  linkContextExt = "/#/";
+  userMessage() {
+    return this.state.msg !== "" ? this.state.msg : " ";
+  }
 
   render() {
     if (!this.state.showHelp) {
@@ -245,9 +250,9 @@ export class BasicGame extends React.Component {
               <p id="game-main-title">Permaximize</p>
             </div>
 
-            <p id="game-main-msg">
-              {this.state.msg !== "" ? this.state.msg : " "}
-            </p>
+            <div id="permaximize-message-block">
+              {this.userMessage()}
+            </div>
 
             <div className="game">
               {this.scoreHeader()}

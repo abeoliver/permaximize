@@ -38,4 +38,5 @@ App.get('/ping', function (req, res) {
 new Permaximize(server);
 
 // Run the server
-server.listen(443, () => console.log("Server listening on 443..."));
+let port = 443;
+server.listen(port, () => console.log(`Server listening on ${port}...`));
