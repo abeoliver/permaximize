@@ -49,6 +49,10 @@
     }
 }
 
+#permaximize-title-link {
+    text-decoration: none;
+}
+
 #permaximize-title-buttons {
     display: flex;
     flex-direction: row;
@@ -56,7 +60,7 @@
 
     position: fixed;
     top: 50vh;
-    margin: 0 0 0 25vw;
+    margin: 25px 0 0 25vw;
     width: 50vw;
 }
 
@@ -118,7 +122,8 @@
     }
 
     .permaximize-title-screen-hover #permaximize-title-main,
-    .permaximize-title-screen-hover #permaximize-title-author {
+    .permaximize-title-screen-hover #permaximize-title-author,
+    .permaximize-title-screen-hover #permaximize-title-link {
         color: white;
         background: none;
         -webkit-background-clip: inherit;
