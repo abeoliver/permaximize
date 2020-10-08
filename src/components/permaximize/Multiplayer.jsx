@@ -9,7 +9,6 @@ import io from "socket.io-client";
 import "./BasicGame.css";
 
 const urlBase = process.env.REACT_APP_URLBASE;
-const socketUrl = process.env.REACT_APP_SOCKET_URL;
 const hashBase = "/permaximize/game/multiplayer/";
 const port = process.env.REACT_APP_PORT;
 
@@ -28,7 +27,6 @@ export class MultiplayerGame extends BasicGame {
   componentDidMount() {
     // Create socket connection
     this.socket = io.connect();
-    console.log(socketUrl);
     // Set event handlers
     this.socket.on("connect", this.onConnect.bind(this));
     this.socket.on("game-state", this.onGameState.bind(this));
@@ -164,7 +162,13 @@ export class MultiplayerGame extends BasicGame {
     );
   }
 
-  linkContextExt = "/#/permaximize/game/multiplayer/1/new";
+  userMessage() {
+    return null;
+    return [
+      <p id="game-main-msg">Player 2 is active</p>,
+      <status-indicator positive pulse id="permaximize-status-indicator"/>
+    ];
+  }
 
   render() {
     if (this.state.id === null || this.state.id === "new" || this.player === null) {
