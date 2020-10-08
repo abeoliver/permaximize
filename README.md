@@ -12,8 +12,8 @@
 ```bash
  # Connect to EC2
  ssh -i ~/keys/permaximize-server-west.pem ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
- # Port forward 9999 to mongodb
- ssh -i ~/keys/permaximize-server-west.pem -N -L 0.0.0.0:9999:127.0.0.1:27017 ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
+ # Port forward 27017 to mongodb
+ ssh -i ~/keys/permaximize-server-west.pem -N -L 0.0.0.0:27017:127.0.0.1:27017 ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
 ```
 # Socket Server API
 `

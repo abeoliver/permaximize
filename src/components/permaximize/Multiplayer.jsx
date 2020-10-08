@@ -163,6 +163,7 @@ export class MultiplayerGame extends BasicGame {
   }
 
   userMessage() {
+    return null;
     return [
       <p id="game-main-msg">Player 2 is active</p>,
       <status-indicator positive pulse id="permaximize-status-indicator"/>
