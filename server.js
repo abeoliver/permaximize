@@ -20,7 +20,7 @@ let server = https.createServer(ssl_options, App);
 
 /***  SEND MAIN APP ***/
 // Security middleware
-App.use(helmet());
+//App.use(helmet());
 // Compress files for send
 App.use(compression());
 // Server all build files statically
