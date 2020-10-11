@@ -4,7 +4,6 @@
  */
 const fs = require("fs");
 const express = require("express");
-const http = require("http");
 const https = require("https");
 const helmet = require("helmet");
 const path = require("path");
@@ -20,8 +19,8 @@ const ssl_options = {
 let server = https.createServer(ssl_options, App);
 
 /***  SEND MAIN APP ***/
-// Enforce HTTPS
-//App.use(helmet());
+// Security middleware
+App.use(helmet());
 // Compress files for send
 App.use(compression());
 // Server all build files statically
