@@ -18,7 +18,7 @@ App.use(helmet());
 
 // set up a route to redirect http to https
 App.get('*', function(req, res) {
-  res.redirect('https://abeoliver.com' + req.url);
+  res.redirect('https://' + req.get('host') + req.originalUrl);
 })
 
 server.listen(80);
