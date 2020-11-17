@@ -5,9 +5,9 @@
 const fs = require("fs");
 const express = require("express");
 const https = require("https");
-const helmet = require("helmet");
 const path = require("path");
 const compression = require('compression');
+const morgan = require("morgan");
 
 const Permaximize = require('./src/components/permaximize/SocketServer');
 
@@ -19,8 +19,10 @@ const ssl_options = {
 let server = https.createServer(ssl_options, App);
 
 /***  SEND MAIN APP ***/
-// Security middleware
-//App.use(helmet());
+// Logging middleware
+// create a write stream (in append mode)
+let logStream = fs.createWriteStream(path.join(__dirname, 'log', 'https.log'), { flags: 'a' });
+App.use(morgan("combined", { stream: logStream }));
 // Compress files for send
 App.use(compression());
 // Server all build files statically
