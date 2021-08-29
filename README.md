@@ -47,5 +47,7 @@ Game {
  - `npm start` Runs development server
  - `npm run build` Build a production-ready app
  - `npm run build:w` Put Webpack into "watch build" mode (don't know if works right now)
- - `npm run deploy` Sync build folder with AWS site
  - `npm run lint` Run ESLint
+
+# Removed from package
+"proxy": "http://localhost:3001",

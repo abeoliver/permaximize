@@ -5,6 +5,7 @@
 const fs = require("fs");
 const express = require("express");
 const https = require("https");
+const http = require("http");
 const path = require("path");
 const compression = require('compression');
 const morgan = require("morgan");
@@ -12,11 +13,12 @@ const morgan = require("morgan");
 const Permaximize = require('./src/components/permaximize/SocketServer');
 
 let App = express();
+/*
 const ssl_options = {
   key: fs.readFileSync("keys/privkey.pem"),
   cert: fs.readFileSync("keys/fullchain.pem")
-};
-let server = https.createServer(ssl_options, App);
+};*/
+let server = http.createServer({}, App);
 
 /***  SEND MAIN APP ***/
 // Logging middleware
@@ -27,14 +29,17 @@ App.use(morgan("combined", { stream: logStream }));
 App.use(compression());
 // Server all build files statically
 App.use(express.static(path.join(__dirname, "/build")));
+
 // Send main launching point
 App.get("/", (req, res) => {
   res.sendFile(path.join(__dirname + "/build/index.html"));
 })
+
 // Allow for connection check
 App.get('/ping', function (req, res) {
   return res.send('pong');
 });
+
 // Run permaximize socket server
 new Permaximize(server);
 
