@@ -2,12 +2,11 @@
  * Schema: Game - Permaximize Online
  * Abraham Oliver, 2020
  */
-const mongoose = require("mongoose");
 
 const gameUtil = require("../src/components/permaximize/game_util");
 
 // _id is defined by the object ID
-let gameSchema = new mongoose.Schema({
+let gameSchema = {
   board: {
     type: String,
     default: JSON.stringify(gameUtil.initialBoard(7))
@@ -35,10 +34,10 @@ let gameSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   }
-});
+};
 
 // Add toSend method (for sending game data across sockets)
-gameSchema.methods.toSend = function () {
+toSend = function () {
   return JSON.stringify({
     id: this._id,
     board: JSON.parse(this.board),
@@ -47,11 +46,7 @@ gameSchema.methods.toSend = function () {
 };
 
 // Add a method to save game history moves
-gameSchema.methods.recordMove = function (move, selected) {
+recordMove = function (move, selected) {
   this.historyPiece1.push(selected[0] * 7 + selected[1]);
   this.historyPiece2.push(move[0] * 7 + move[1]);
 }
-
-let Game = new mongoose.model("Game", gameSchema);
-
-module.exports = Game;

@@ -27,3 +27,5 @@ keys/
 media/
 
 log/
+/backend/.aws-sam/
+/backend/build/
