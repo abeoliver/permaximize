@@ -8,23 +8,154 @@ Description: >-
 Transform:
 - AWS::Serverless-2016-10-31
 
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Timeout: 180
+    MemorySize: 128
+    Environment:
+      Variables:
+        DB_TABLE_NAME: Games
+
 Resources:
+  SocketAPI:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: PermaximizeSocketAPI
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  ProdDeploy:
+    Type: AWS::ApiGatewayV2::Deployment
+    Properties:
+      ApiId: !Ref SocketAPI
+
+  ProdStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: Prod
+      Description: Prod Stage
+      ApiId: !Ref SocketAPI
+      DeploymentId: !Ref ProdDeploy
+
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - ConnectIntegration
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: "$connect"
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectIntegration
+
+  ConnectHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/game.connectHandler
+      Runtime: nodejs14.x
+      Description: Websocket connection function
+
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - ConnectHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: Test Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectHandler.Arn}/invocations
+
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - DefaultIntegration
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: "$default"
+      OperationName: DefaultRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref DefaultIntegration
+
+  DefaultHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/game.defaultHandler
+      Description: Websocket default function
+
+  DefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - DefaultHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: Test Default Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DefaultHandler.Arn}/invocations
+
+
+  ListAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - ListAllIntegration
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: "list"
+      OperationName: ListAllRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ListAllIntegration
+
+  ListAllHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/game.getAllItemsHandler
+      Description: Websocket list all function
+
+  ListAllIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - ListAllHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAllHandler.Arn}/invocations
+
+
+
+  AuthorizerHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/auth.authorizer
+
+
   getAllItemsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/game.getAllItemsHandler
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 100
       Description: A simple example includes a HTTP get method to get all items from a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the GamesTable
         - DynamoDBCrudPolicy:
             TableName: !Ref GamesTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref GamesTable
       Events:
         Api:
           Type: Api
@@ -36,18 +167,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/game.getByIdHandler
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 100
       Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
       Policies:
         # Give Create/Read/Update/Delete Permissions to the GamesTable
         - DynamoDBCrudPolicy:
             TableName: !Ref GamesTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref GamesTable
       Events:
         Api:
           Type: Api
@@ -59,18 +183,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/game.putItemHandler
-      Runtime: nodejs14.x
-      MemorySize: 128
-      Timeout: 100
       Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
       Policies:
         # Give Create/Read/Update/Delete Permissions to the GamesTable
         - DynamoDBCrudPolicy:
             TableName: !Ref GamesTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref GamesTable
       Events:
         Api:
           Type: Api

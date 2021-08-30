@@ -1,4 +1,4 @@
-const tableName = process.env.SAMPLE_TABLE;
+const tableName = process.env.DB_TABLE_NAME;
 
 // Create a DocumentClient that represents the query to add an item
 const dynamodb = require('aws-sdk/clients/dynamodb');
@@ -80,4 +80,17 @@ exports.putItemHandler = async (event) => {
   // All log statements are written to CloudWatch
   console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
   return response;
+}
+
+exports.connectHandler = async (event, context, callback) => {
+  console.log("Socket connection successful");
+  callback(null, "CUSTOM MESSAGE")
+}
+
+exports.defaultHandler = async (event) => {
+  console.log("Socket default successful");
+  return {
+    statusCode: 200,
+    body: "DEFAULT MESSAGE"
+  };
 }
