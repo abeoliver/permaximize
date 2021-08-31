@@ -1,8 +1,31 @@
 const tableName = process.env.DB_TABLE_NAME;
 
 // Create a DocumentClient that represents the query to add an item
+const AWS = require("aws-sdk");
 const dynamodb = require('aws-sdk/clients/dynamodb');
 const docClient = new dynamodb.DocumentClient();
+
+// https://hackernoon.com/websockets-api-gateway-9d4aca493d39
+// https://medium.com/hackernoon/websockets-api-gateway-9d4aca493d39
+async function send(data, event, callback) {
+  const apig = new AWS.ApiGatewayManagementApi({
+    endpoint: "q7uxempud1.execute-api.us-west-1.amazonaws.com/Prod/",
+  });
+
+  let sdata = JSON.stringify(data);
+
+  await apig.postToConnection({
+        ConnectionId: event.requestContext.connectionId,
+        Data: sdata
+      }).promise();
+  let response = {
+    "statusCode": 200,
+    "headers": {},
+    "body": "",
+    "isBase64Encoded": false
+  };
+  callback(null, response);
+}
 
 exports.getAllItemsHandler = async (event) => {
   if (event.httpMethod !== 'GET') {
@@ -84,13 +107,10 @@ exports.putItemHandler = async (event) => {
 
 exports.connectHandler = async (event, context, callback) => {
   console.log("Socket connection successful");
-  callback(null, "CUSTOM MESSAGE")
+  callback(null, {});
 }
 
-exports.defaultHandler = async (event) => {
+exports.defaultHandler = async (event, context, callback) => {
   console.log("Socket default successful");
-  return {
-    statusCode: 200,
-    body: "DEFAULT MESSAGE"
-  };
+  await send({"newkey": "newval"}, event, callback);
 }

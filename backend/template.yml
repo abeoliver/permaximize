@@ -18,6 +18,29 @@ Globals:
         DB_TABLE_NAME: Games
 
 Resources:
+  ApiGatewayIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyName: PermaximizeAPILambdaAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 'lambda:*'
+                Resource: '*'
+
   SocketAPI:
     Type: AWS::ApiGatewayV2::Api
     Properties:
@@ -57,7 +80,6 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/game.connectHandler
-      Runtime: nodejs14.x
       Description: Websocket connection function
 
   ConnectIntegration:
@@ -72,6 +94,16 @@ Resources:
       IntegrationUri:
         Fn::Sub:
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectHandler.Arn}/invocations
+
+  ApiGatewayPermissionConnect:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SocketAPI
+      - ConnectHandler
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ConnectHandler
+      Principal: apigateway.amazonaws.com
 
 
   DefaultRoute:
@@ -93,6 +125,15 @@ Resources:
     Properties:
       Handler: src/game.defaultHandler
       Description: Websocket default function
+      # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'execute-api:ManageConnections'
+            Resource:
+              - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
 
   DefaultIntegration:
     Type: AWS::ApiGatewayV2::Integration
@@ -107,93 +148,23 @@ Resources:
         Fn::Sub:
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DefaultHandler.Arn}/invocations
 
-
-  ListAllRoute:
-    Type: AWS::ApiGatewayV2::Route
-    DependsOn:
-      - ListAllIntegration
+  DefaultResponse:
+    Type: AWS::ApiGatewayV2::RouteResponse
     Properties:
+      RouteId: !Ref DefaultRoute
       ApiId: !Ref SocketAPI
-      RouteKey: "list"
-      OperationName: ListAllRoute
-      AuthorizationType: NONE
-      Target: !Join
-        - '/'
-        - - 'integrations'
-          - !Ref ListAllIntegration
+      RouteResponseKey: $default
 
-  ListAllHandler:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/game.getAllItemsHandler
-      Description: Websocket list all function
-
-  ListAllIntegration:
-    Type: AWS::ApiGatewayV2::Integration
+  ApiGatewayPermissionDefault:
+    Type: AWS::Lambda::Permission
     DependsOn:
-      - ListAllHandler
+      - SocketAPI
+      - DefaultHandler
     Properties:
-      ApiId: !Ref SocketAPI
-      IntegrationType: AWS_PROXY
-      IntegrationMethod: POST
-      IntegrationUri:
-        Fn::Sub:
-          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAllHandler.Arn}/invocations
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DefaultHandler
+      Principal: apigateway.amazonaws.com
 
-
-
-  AuthorizerHandler:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/auth.authorizer
-
-
-  getAllItemsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/game.getAllItemsHandler
-      Description: A simple example includes a HTTP get method to get all items from a DynamoDB table.
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref GamesTable
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /
-            Method: GET
-
-  getByIdFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/game.getByIdHandler
-      Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the GamesTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref GamesTable
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /{id}
-            Method: GET
-
-  putItemFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/game.putItemHandler
-      Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the GamesTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref GamesTable
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /
-            Method: POST
 
   GamesTable:
     Type: AWS::Serverless::SimpleTable
@@ -206,4 +177,4 @@ Resources:
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "wss://${SocketAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
