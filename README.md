@@ -1,42 +1,43 @@
 # Todo
- - Deploy (maybe www.abeoliver.com)
+ - Deploy (maybe permaximize.com)
  - Animations
- - UI message display content (half implemented)
+ - Chat
  - Computer player
  - Nav bar and title bar
  - Player is active/deactive indicator
- - MongoDB URL in SocketServer put credentials in production file
- - Redirect HTTP to HTTPS (Helmet?)
+ - Socket info in memcache
+ - Increase security
  
 # Deployment
 ```bash
- # Connect to EC2
- ssh -i ~/keys/permaximize-server-west.pem ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
- # Port forward 27017 to mongodb
- ssh -i ~/keys/permaximize-server-west.pem -N -L 0.0.0.0:27017:127.0.0.1:27017 ubuntu@ec2-54-241-235-186.us-west-1.compute.amazonaws.com
+
 ```
 # Socket Server API
 `
 GameSend {id, board, turn}
 `
 
-Events:
- - `new-game` Sent from the client to the server to request a new game. The server acknowledges
- the request with a `GameSend`. Always sent from the player 1 client.
- - `join-game` Sent from the client to request a connection to a given game by its ID. The
+Client Sent Events:
+ - `{"action": "new"}` Sent from the client to the server to request a new game. The server acknowledges
+ the request with a `GameSend`. Always sent from the player 1 client. No parameters.
+ - `{"action": "join", "id": <id>, "player": <p>}` Sent from the client to request a connection to a given game by its ID. The
  server acknowledges the request with a `GameSend`.
- - `game-state` Sent from the server to the client when the state of the game has changed,
- likely because the other player made a move. Formatted as `GameSend`.
- - `update-game` Sent from the client to the server when the player has made a change to the
- game. Sent as a `GameSend`.
- - `reset-multi-game` Restart a multiplayer game and send a new state to both players
+ - `{"action": "update","id": <id>,"selected": [0, 0], "second": [0, 1]}` Sent from the client to the server when the player has made a change to the
+ game. 
+ - `{"action": "update","id": <id>}` Restart a multiplayer game and send a new state to both players
  
+Server Sent Events:
+- `update` Sent from the server to the client when the state of the game has changed,
+  likely because the other player made a move. Formatted as `GameSend`.
+
  # Database Schema
  ```$xslt
 Game {
-    _id: ObjectId
+    id: ObjectId
     board: String // Defaults to initial board
     turn: Number  // Defaults to 0
+    p1: String    // ConnectionId for player 1
+    p2: String    // ConnectionId for player 2
 }
 ```
  
