@@ -36,10 +36,22 @@ async function send(connection, data, event, callback) {
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
   });
 
-  await apig.postToConnection({
-        ConnectionId: connection,
-        Data: data
-      }).promise();
+  try {
+    await apig.postToConnection({
+      ConnectionId: connection,
+      Data: data
+    }).promise();
+  } catch (e) {
+    // https://github.com/aws-samples/simple-websockets-chat-app/blob/master/sendmessage/app.js
+    /*   FOR A SOCKET TABLE
+    if (e.statusCode === 410) {
+      console.log(`Found stale connection, deleting ${connection}`);
+      await docClient.delete({ TableName: tableName, Key: { connection } }).promise();
+    } else {
+      throw e;
+    }
+     */
+  }
   let response = {
     "statusCode": 200,
     "headers": {},
@@ -49,20 +61,18 @@ async function send(connection, data, event, callback) {
   callback(null, response);
 }
 
-async function send_both(c1, c2, data, event, callback) {
+async function sendBoth(c1, c2, data, event, callback) {
   // https://hackernoon.com/websockets-api-gateway-9d4aca493d39
   const apig = new AWS.ApiGatewayManagementApi({
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
   });
 
-  await apig.postToConnection({
-    ConnectionId: c1,
-    Data: data
-  }).promise();
-  await apig.postToConnection({
-    ConnectionId: c2,
-    Data: data
-  }).promise();
+  let promises = [
+      apig.postToConnection({ConnectionId: c1, Data: data}).promise(),
+      apig.postToConnection({ConnectionId: c2, Data: data}).promise()
+  ];
+
+  await Promise.all(promises);
 
   let response = {
     "statusCode": 200,
@@ -95,8 +105,10 @@ exports.defaultHandler = async (event, context, callback) => {
 exports.updateHandler = async (event, context, callback) => {
   // Get current game data from db
   let game = await loadGame(event);
-
-  game.p1 = event.requestContext.connectionId;
+  if (!game) {
+    await send(event.requestContext.connectionId, "HELP UPDATE", event, callback);
+    return;
+  }
 
   let selected = JSON.parse(event.body).selected;
   let second = JSON.parse(event.body).second;
@@ -115,22 +127,19 @@ exports.updateHandler = async (event, context, callback) => {
   // MORE VALIDATION NEEDED
 
   // Make board from event's move
-  game.board = util.flipPieces(game.board, selected, second);
+  game.board = util.executeMove(game.board, selected, second);
+  game.turn = game.turn + 1;
 
   // Update db record for game
   let params = {
     TableName : tableName,
     Item: game
   };
-  const result = await docClient.put(params).promise();
   // ERROR IF NEEDED
 
   // Send new game info to other player
-  /*
-  if (firstPlayer && game.p2) await send(game.p2, gameSend(game), event, callback);
-  else await send(game.p1, gameSend(game), event, callback);
-   */
-  await send(game.p1, gameSend(game), event, callback);
+  await sendBoth(game.p1, game.p2, gameSend(game), event, callback);
+  await docClient.put(params);
 }
 
 exports.newGameHandler = async (event, context, callback) => {
@@ -142,14 +151,18 @@ exports.newGameHandler = async (event, context, callback) => {
     TableName : tableName,
     Item: game
   };
-  const result = await docClient.put(params).promise();
   // ERROR IF NEEDED
   await send(game.p1, gameSend(game), event, callback);
+  docClient.put(params).promise().then(()=> console.log("PUTTED"));
 }
 
 exports.joinGameHandler = async (event, context, callback) => {
   // Get current game data from db
   let game = await loadGame(event);
+  if (!game) {
+    await send(event.requestContext.connectionId, "HELP JOIN", event, callback);
+    return;
+  }
 
   if (JSON.parse(event.body).player == 1) {
     game.p1 = event.requestContext.connectionId
@@ -162,14 +175,18 @@ exports.joinGameHandler = async (event, context, callback) => {
     TableName : tableName,
     Item: game
   };
-  const result = await docClient.put(params).promise();
 
   await send(event.requestContext.connectionId, gameSend(game), event, callback);
+  await docClient.put(params).promise();
 }
 
 exports.resetGameHandler = async (event, context, callback) => {
   // Get current game data from db
   let old_game = await loadGame(event);
+  if (!old_game) {
+    await send(event.requestContext.connectionId, "HELP RESET", event, callback);
+    return;
+  }
   // GET NEW ID?
   const id = Math.floor(Math.random() * 1000);
 
@@ -184,15 +201,15 @@ exports.resetGameHandler = async (event, context, callback) => {
     game.p2 = old_game.p1;
   }
 
-  // Upload new game to db
-  const result = await docClient.put({
-    TableName : tableName,
-    Item: game
-  }).promise();
-
   // ERROR IF NEEDED
   // CHECK TO SEE IF PLAYERS ARE ALIVE
 
   // Send new game to both players
-  await send_both(game.p1, game.p2, gameSend(game), event, callback);
+  await sendBoth(game.p1, game.p2, gameSend(game), event, callback);
+
+  // Upload new game to db
+  docClient.put({
+    TableName : tableName,
+    Item: game
+  });
 }

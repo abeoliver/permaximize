@@ -7,6 +7,7 @@
  - Player is active/deactive indicator
  - Socket info in memcache
  - Increase security
+ - Resolve util files (executeMove in particular)
  
 # Deployment
 ```bash

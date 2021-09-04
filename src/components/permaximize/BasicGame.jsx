@@ -134,9 +134,7 @@ export class BasicGame extends React.Component {
 
   executeMove(move, selected) {
     // Flip board pieces
-    let newBoard = gameUtil.flipPieces(this.state.board, selected, move);
-    // Make solid status
-    newBoard[move[0]][move[1]] -= 2;
+    let newBoard = gameUtil.executeMove(this.state.board, selected, move);
     // Save updated game state
     this.setState({selected: null, board: newBoard, turn: this.state.turn + 1});
     // Update score

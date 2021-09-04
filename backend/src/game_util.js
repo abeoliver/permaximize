@@ -34,10 +34,13 @@ function zeros(w) {
 }
 
 /*
- * flipPieces
- * Flip two game pieces
+ * executeMove
+ * Flip two pieces and solidify the first selected one
  */
-function flipPieces(board, selected, second) {
+function executeMove(board, selected, second) {
+  // Make solid status
+  board[selected[0]][selected[1]] += 2;
+  // Flip pieces
   let tmp = board[second[0]][second[1]];
   board[second[0]][second[1]] = board[selected[0]][selected[1]];
   board[selected[0]][selected[1]] = tmp;
@@ -118,7 +121,7 @@ function result(score) {
 }
 
 exports.initialBoard = initialBoard;
-exports.flipPieces = flipPieces;
+exports.executeMove = executeMove;
 exports.zeros = zeros;
 exports.analyzeBoard = analyzeBoard;
 exports.result = result;
