@@ -8,6 +8,7 @@
 const AWS = require("aws-sdk");
 const dynamodb = require('aws-sdk/clients/dynamodb');
 const docClient = new dynamodb.DocumentClient();
+const jwt = require('jsonwebtoken');
 const util = require("./game_util");
 
 const tableName = process.env.DB_TABLE_NAME;
@@ -121,7 +122,7 @@ exports.updateHandler = async (event, context, callback) => {
     firstPlayer = false;
   } else {
     // BIG ERROR
-    callback("P2 ERROR");
+    callback("BIG ERROR");
     return;
   }
   // MORE VALIDATION NEEDED
@@ -153,7 +154,7 @@ exports.newGameHandler = async (event, context, callback) => {
   };
   // ERROR IF NEEDED
   await send(game.p1, gameSend(game), event, callback);
-  docClient.put(params).promise().then(()=> console.log("PUTTED"));
+  await docClient.put(params).promise();
 }
 
 exports.joinGameHandler = async (event, context, callback) => {

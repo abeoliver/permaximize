@@ -38,8 +38,9 @@ function zeros(w) {
  * Flip two pieces and solidify the first selected one
  */
 function executeMove(board, selected, second) {
+  let player = board[selected[0]][selected[1]] % 2 == 1 ? 1 : 2;
   // Make solid status
-  board[selected[0]][selected[1]] -= 2;
+  board[selected[0]][selected[1]] = player + 2;
   // Flip pieces
   let tmp = board[second[0]][second[1]];
   board[second[0]][second[1]] = board[selected[0]][selected[1]];

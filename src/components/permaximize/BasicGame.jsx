@@ -7,8 +7,6 @@
  * 2 : Player 2 normal
  * 3 : Player 1 solid
  * 4 : Player 2 solid
- * 5 : Player 1 selected
- * 6 : Player 2 selected
  */
 
 import React from 'react';
@@ -103,23 +101,22 @@ export class BasicGame extends React.Component {
    */
   handlePieceClick(row, col) {
     if (!this.allowClick(row, col)) return;
-    let newBoard = this.state.board;
     // Set the main selected piece if not chosen yet
     if (this.state.selected === null) {
       // Do not choose a piece of the other color
-      if (newBoard[row][col] === this.opposingPlayer()) return;
+      if (this.state.board[row][col] === this.opposingPlayer()) return;
       // Make selected status
-      newBoard[row][col] = newBoard[row][col] + 4;
-      this.setState({selected: [row, col], board: newBoard});
+      //newBoard[row][col] = newBoard[row][col] + 4;
+      this.setState({selected: [row, col]});
       return;
     // Un-choose if already selected
     } else if (this.state.selected[0] === row && this.state.selected[1] === col) {
-      newBoard[row][col] = newBoard[row][col] - 4;
-      this.setState({selected: null, board: newBoard});
+      //newBoard[row][col] = newBoard[row][col] - 4;
+      this.setState({selected: null});
       return;
     }
     // Do not choose a piece of the player's own color
-    if (newBoard[row][col] === this.currentPlayer()) return;
+    if (this.state.board[row][col] === this.currentPlayer()) return;
     // If a valid move has been chosen
     this.executeMove([row, col], this.state.selected);
   }
@@ -133,6 +130,7 @@ export class BasicGame extends React.Component {
   }
 
   executeMove(move, selected) {
+    console.log("BASIC EXECUTE MOVE");
     // Flip board pieces
     let newBoard = gameUtil.executeMove(this.state.board, selected, move);
     // Save updated game state
@@ -207,8 +205,14 @@ export class BasicGame extends React.Component {
     let list = [];
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
+        let status = this.state.board[i][j];
+        // Highlight selected piece
+        if (this.state.selected && this.state.selected[0] == i
+            && this.state.selected[1] == j) {
+          status += 4;
+        }
         list.push(
-            <Piece status={this.state.board[i][j]} key={(i * this.size) + j}
+            <Piece status={status} key={(i * this.size) + j}
                    largest={this.state.largest[i][j]}
                    handleClick={() => this.handlePieceClick(i, j)}
             />
