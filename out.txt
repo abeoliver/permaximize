@@ -1,1 +1,0 @@
-{"errorType":"TypeError","errorMessage":"Cannot read property 'connectionId' of undefined","trace":["TypeError: Cannot read property 'connectionId' of undefined","    at Runtime.exports.defaultHandler [as handler] (/var/task/src/game.js:76:35)","    at Runtime.handleOnce (/var/runtime/Runtime.js:66:25)"]}

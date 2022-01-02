@@ -11,6 +11,7 @@ import "./BasicGame.css";
 const urlBase = process.env.REACT_APP_URLBASE;
 const hashBase = "/permaximize/game/multiplayer/";
 const port = process.env.REACT_APP_PORT;
+const apiServer = process.env.REACT_APP_API_SERVER;
 
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
@@ -26,7 +27,7 @@ export class MultiplayerGame extends BasicGame {
 
   componentDidMount() {
     // Create WebSocket connection.
-    this.socket = new WebSocket('wss://lm48hjnz77.execute-api.us-west-1.amazonaws.com/Prod/ ');
+    this.socket = new WebSocket(apiServer);
     this.socket.addEventListener('open', this.onConnect.bind(this));
     this.socket.addEventListener('message', this.onGameState.bind(this));
 

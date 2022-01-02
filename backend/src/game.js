@@ -10,6 +10,7 @@ const dynamodb = require('aws-sdk/clients/dynamodb');
 const docClient = new dynamodb.DocumentClient();
 const jwt = require('jsonwebtoken');
 const util = require("./game_util");
+const permaximize = require("./permaximize_game");
 
 const tableName = process.env.DB_TABLE_NAME;
 
@@ -37,6 +38,13 @@ async function send(connection, data, event, callback) {
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
   });
 
+  let response = {
+    "statusCode": 200,
+    "headers": {},
+    "body": data,
+    "isBase64Encoded": false
+  };
+
   try {
     await apig.postToConnection({
       ConnectionId: connection,
@@ -52,13 +60,8 @@ async function send(connection, data, event, callback) {
       throw e;
     }
      */
+    response.statusCode = 500;
   }
-  let response = {
-    "statusCode": 200,
-    "headers": {},
-    "body": data,
-    "isBase64Encoded": false
-  };
   callback(null, response);
 }
 
@@ -68,9 +71,16 @@ async function sendBoth(c1, c2, data, event, callback) {
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
   });
 
+  let error = false;
+
+  let conn_error = (er) => {
+    error = true;
+    console.log("Player is not available");
+  }
+
   let promises = [
-      apig.postToConnection({ConnectionId: c1, Data: data}).promise(),
-      apig.postToConnection({ConnectionId: c2, Data: data}).promise()
+      apig.postToConnection({ConnectionId: c1, Data: data}).promise().catch(conn_error),
+      apig.postToConnection({ConnectionId: c2, Data: data}).promise().catch(conn_error)
   ];
 
   await Promise.all(promises);
@@ -139,6 +149,7 @@ exports.updateHandler = async (event, context, callback) => {
   // ERROR IF NEEDED
 
   // Send new game info to other player
+  console.log(game);
   await sendBoth(game.p1, game.p2, gameSend(game), event, callback);
   await docClient.put(params);
 }

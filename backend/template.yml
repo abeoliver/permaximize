@@ -2,7 +2,7 @@
 # Abraham Oliver, 2021
 # AWS SAM Specification
 
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
   backend
 Transform:
