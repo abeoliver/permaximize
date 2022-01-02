@@ -60,8 +60,8 @@ export class MultiplayerGame extends BasicGame {
   }
 
   executeMove(move, selected) {
-    // Play the move on the board
-    // let result = super.executeMove(move, selected);
+    // Play the move on the board (will override on nextGameState if issue)
+    super.executeMove(move, selected);
     // Send move to server
     this.socket.send(JSON.stringify({
       "action": "update", "id": this.state.id,

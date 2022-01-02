@@ -1,7 +1,8 @@
-const server = require("./server");
+const server = require("./game-server");
 
+const apiEndpoint = "lm48hjnz77.execute-api.us-west-1.amazonaws.com/Prod/";
 const DEFAULT_SIZE = 7;
-const ID_SPACE_SIZE = 10000;
+const ID_SPACE_SIZE = 1e12;
 
 // Translate DB object to client-send object
 function gameSend(game) {
@@ -127,7 +128,7 @@ function resetFunc(old_game) {
 exports.connectHandler = server.buildConnectHandler(connectFunc);
 exports.disconnectHandler = server.buildDisconnectHandler(disconnectFunc);
 exports.defaultHandler = server.buildDefaultHandler(defaultFunc);
-exports.newGameHandler = server.buildNewGameHandler(newGameFunc, gameSend);
-exports.updateHandler = server.buildUpdateHandler(updateFunc, gameSend)
-exports.joinGameHandler = server.buildJoinGameHandler(gameSend);
-exports.resetGameHandler = server.buildResetGameHandler(resetFunc, gameSend);
+exports.newGameHandler = server.buildNewGameHandler(newGameFunc, gameSend, apiEndpoint);
+exports.updateHandler = server.buildUpdateHandler(updateFunc, gameSend, apiEndpoint)
+exports.joinGameHandler = server.buildJoinGameHandler(gameSend, apiEndpoint);
+exports.resetGameHandler = server.buildResetGameHandler(resetFunc, gameSend, apiEndpoint);
