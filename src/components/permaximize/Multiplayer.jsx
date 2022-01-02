@@ -8,10 +8,10 @@ import { BasicGame } from "./BasicGame";
 import io from "socket.io-client";
 import "./BasicGame.css";
 
-const urlBase = process.env.REACT_APP_URLBASE;
+const protocol = "http://";
+const domainBase = "abeoliver.com";
 const hashBase = "/permaximize/game/multiplayer/";
-const port = process.env.REACT_APP_PORT;
-const apiServer = process.env.REACT_APP_API_SERVER;
+const apiServer = "wss://lm48hjnz77.execute-api.us-west-1.amazonaws.com/Prod/";
 
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
@@ -135,7 +135,7 @@ export class MultiplayerGame extends BasicGame {
                   <div>
                     {showLink ?
                         ([(<p id="multiplayer-link" onClick={this.copyLinkToClipboard}>
-                          {urlBase + (port !== "0" ? ":" + port : "") + "/#/permaximize/game/multiplayer/2/" + this.state.id}
+                          {protocol + domainBase + "/#" + hashBase + "2/" + this.state.id}
                         </p>),
                           (<p id="multiplayer-link-copy">(click link to copy)</p>)]) :
                         ""

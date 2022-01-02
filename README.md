@@ -1,17 +1,20 @@
+# Permaximize
+## Abraham Oliver, 2022
+
 # Todo
- - Deploy (maybe permaximize.com)
  - Animations
- - Chat
  - Computer player
- - Nav bar and title bar
  - Player is active/deactive indicator
- - Socket info in memcache
- - Increase security
- - Resolve util files (executeMove in particular)
+ - Socket info in memcache / socket table
+ - Generalize game server
+ - Improve error messages / actions
  
 # Deployment
 ```bash
-
+# Deploy backend from backend/
+sam build && sam deploy
+# Deploy frontend from root
+npm run deploy
 ```
 # Socket Server API
 `
@@ -41,15 +44,3 @@ Game {
     p2: String    // ConnectionId for player 2
 }
 ```
- 
- ## Available Scripts
- 
- In the project directory, you can run:
- 
- - `npm start` Runs development server
- - `npm run build` Build a production-ready app
- - `npm run build:w` Put Webpack into "watch build" mode (don't know if works right now)
- - `npm run lint` Run ESLint
-
-# Removed from package
-"proxy": "http://localhost:3001",

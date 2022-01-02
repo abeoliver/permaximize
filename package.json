@@ -31,6 +31,7 @@
     "ws": "^7.3.1"
   },
   "scripts": {
+    "deploy": "react-scripts build && aws s3 sync ~/git/permaximize/build s3://abeoliver.com/",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:w": "react-scripts build --watch",

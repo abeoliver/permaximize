@@ -67,7 +67,7 @@ Resources:
   ConnectHandler:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/game.connectHandler
+      Handler: src/permaximize_game.connectHandler
       Description: Websocket connection function
 
   ConnectIntegration:
@@ -113,7 +113,7 @@ Resources:
     DependsOn:
       - SocketAPI
     Properties:
-      Handler: src/game.updateHandler
+      Handler: src/permaximize_game.updateHandler
       Description: Websocket update function
       Policies:
         - DynamoDBCrudPolicy:
@@ -170,7 +170,7 @@ Resources:
     DependsOn:
       - SocketAPI
     Properties:
-      Handler: src/game.newGameHandler
+      Handler: src/permaximize_game.newGameHandler
       Description: Websocket new game function
       Policies:
         - DynamoDBCrudPolicy:
@@ -227,7 +227,7 @@ Resources:
     DependsOn:
       - SocketAPI
     Properties:
-      Handler: src/game.joinGameHandler
+      Handler: src/permaximize_game.joinGameHandler
       Description: Websocket join game function
       Policies:
         - DynamoDBCrudPolicy:
@@ -284,7 +284,7 @@ Resources:
     DependsOn:
       - SocketAPI
     Properties:
-      Handler: src/game.resetGameHandler
+      Handler: src/permaximize_game.resetGameHandler
       Description: Websocket reset game function
       Policies:
         - DynamoDBCrudPolicy:
@@ -341,7 +341,7 @@ Resources:
     DependsOn:
       - SocketAPI
     Properties:
-      Handler: src/game.defaultHandler
+      Handler: src/permaximize_game.defaultHandler
       Description: Websocket default function
       Policies:
         # https://serverlessland.com/patterns/apigw-websocket-api-lambda
