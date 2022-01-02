@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "permaximize"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1653x64o16m65"
+s3_prefix = "permaximize"
+region = "us-west-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"

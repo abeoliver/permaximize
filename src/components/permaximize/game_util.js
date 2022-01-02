@@ -3,6 +3,8 @@
  * Abraham Oliver, 2020
  */
 
+exports.DEFAULT_SIZE = 7;
+
 /*
  * initialBoard
  * Create the initial board state array
@@ -32,10 +34,14 @@ function zeros(w) {
 }
 
 /*
- * flipPieces
- * Flip two game pieces
+ * executeMove
+ * Flip two pieces and solidify the first selected one
  */
-function flipPieces(board, selected, second) {
+function executeMove(board, selected, second) {
+  let player = board[selected[0]][selected[1]] % 2 == 1 ? 1 : 2;
+  // Make solid status
+  board[selected[0]][selected[1]] = player + 2;
+  // Flip pieces
   let tmp = board[second[0]][second[1]];
   board[second[0]][second[1]] = board[selected[0]][selected[1]];
   board[selected[0]][selected[1]] = tmp;
@@ -109,7 +115,14 @@ function analyzeBoard(board) {
   return [largestBlobs, maxSizes];
 }
 
+function result(score) {
+  if (score[0] === score[1]) return 0;
+  else if (score[0] > score[1]) return 1;
+  else return 2;
+}
+
 exports.initialBoard = initialBoard;
-exports.flipPieces = flipPieces;
+exports.executeMove = executeMove;
 exports.zeros = zeros;
 exports.analyzeBoard = analyzeBoard;
+exports.result = result;

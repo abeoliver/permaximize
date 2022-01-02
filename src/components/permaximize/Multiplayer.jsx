@@ -8,9 +8,10 @@ import { BasicGame } from "./BasicGame";
 import io from "socket.io-client";
 import "./BasicGame.css";
 
-const urlBase = process.env.REACT_APP_URLBASE;
+const protocol = "http://";
+const domainBase = "abeoliver.com";
 const hashBase = "/permaximize/game/multiplayer/";
-const port = process.env.REACT_APP_PORT;
+const apiServer = "wss://lm48hjnz77.execute-api.us-west-1.amazonaws.com/Prod/";
 
 export class MultiplayerGame extends BasicGame {
   constructor(props) {
@@ -25,12 +26,11 @@ export class MultiplayerGame extends BasicGame {
   }
 
   componentDidMount() {
-    // Create socket connection
-    this.socket = io.connect();
-    // Set event handlers
-    this.socket.on("connect", this.onConnect.bind(this));
-    this.socket.on("game-state", this.onGameState.bind(this));
-    this.socket.on("disconnect", () => console.log("DISCONNECTED FROM SOCKET SERVER"));
+    // Create WebSocket connection.
+    this.socket = new WebSocket(apiServer);
+    this.socket.addEventListener('open', this.onConnect.bind(this));
+    this.socket.addEventListener('message', this.onGameState.bind(this));
+
 
     super.componentDidMount();
 
@@ -44,7 +44,8 @@ export class MultiplayerGame extends BasicGame {
 
   resetState() {
     // Request a new game
-    this.socket.emit('reset-multi-game', JSON.stringify({id: this.state.id, player: this.player}));
+    this.socket.send(JSON.stringify({"action": "reset", "id": this.state.id}));
+    // Set new game to state? or auto updated on message?
   }
 
   // Override to prevent playing as other player
@@ -59,17 +60,13 @@ export class MultiplayerGame extends BasicGame {
   }
 
   executeMove(move, selected) {
-    // Play the move on the board
-    let result = super.executeMove(move, selected);
+    // Play the move on the board (will override on nextGameState if issue)
+    super.executeMove(move, selected);
     // Send move to server
-    this.socket.emit("game-update", JSON.stringify({
-      id: this.state.id,
-      board: this.state.board,
-      turn: this.state.turn + 1,
-      move: move,
-      selected: selected,
-      score: result[1]
-    }), () => null); // Add acknowledgment as third argument
+    this.socket.send(JSON.stringify({
+      "action": "update", "id": this.state.id,
+      "selected": selected, "second": move
+    }));
   }
 
   onConnect() {
@@ -77,33 +74,25 @@ export class MultiplayerGame extends BasicGame {
     // Find already built game if client provided ID
     if (this.state.id !== null && this.state.id !== "new") {
       // Send a join game event
-      this.socket.emit("join-game", JSON.stringify({
-        id: this.state.id,
-        player: this.player
-      }), (data) => {
-        // Set the state of the game based on the server's response
-        this.onGameState(data);
-      });
+      this.socket.send(JSON.stringify({
+        "action": "join", "id": this.state.id, "player": this.player
+      }));
+      //this.onGameState(data);
       return;
     }
     // Otherwise, request a new game
-    this.socket.emit('new-game', "", (data) => {
-      // Get ID from new game and put it into URL fragment in case user reloads
-      this.setState({id: JSON.parse(data).id});
-      window.location.hash = hashBase + this.player + "/" + this.state.id;
-      // Set game state based on response
-      this.onGameState(data);
-    });
+    this.socket.send(JSON.stringify({"action": "new"}));
   }
 
   onGameState(data) {
-    data = JSON.parse(data);
+    console.log("NEW MESSAGE :: ", data);
+    data = JSON.parse(data.data);
     // Get ID from new game and put it into URL fragment in case user reloads
     if (data.id !== this.state.id) {
       window.location.hash = hashBase + this.player + "/" + data.id;
       this.setState({id: data.id});
     }
-    this.setState({board: data.board, turn: data.turn});
+    this.setState({board: data.board, turn: data.turn, selected: null});
     if (data.board) this.updateScore(data.board);
   }
 
@@ -146,7 +135,7 @@ export class MultiplayerGame extends BasicGame {
                   <div>
                     {showLink ?
                         ([(<p id="multiplayer-link" onClick={this.copyLinkToClipboard}>
-                          {urlBase + (port !== "0" ? ":" + port : "") + "/#/permaximize/game/multiplayer/2/" + this.state.id}
+                          {protocol + domainBase + "/#" + hashBase + "2/" + this.state.id}
                         </p>),
                           (<p id="multiplayer-link-copy">(click link to copy)</p>)]) :
                         ""

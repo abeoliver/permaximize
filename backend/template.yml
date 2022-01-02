@@ -1,0 +1,391 @@
+# PERMAXIMIZE BACKEND
+# Abraham Oliver, 2021
+# AWS SAM Specification
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  backend
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Timeout: 180
+    MemorySize: 128
+    Environment:
+      Variables:
+        DB_TABLE_NAME: Games
+
+Resources:
+
+  SocketAPI:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: PermaximizeSocketAPI
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  ProdDeploy:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - SocketAPI
+      - UpdateRoute
+      - ConnectRoute
+      - NewGameRoute
+      - JoinGameRoute
+      - ResetGameRoute
+      - DefaultRoute
+    Properties:
+      ApiId: !Ref SocketAPI
+
+  ProdStage:
+    Type: AWS::ApiGatewayV2::Stage
+    DependsOn:
+      - SocketAPI
+    Properties:
+      StageName: Prod
+      Description: Prod Stage
+      ApiId: !Ref SocketAPI
+      DeploymentId: !Ref ProdDeploy
+
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - ConnectGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectIntegration
+
+  ConnectHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/permaximize_game.connectHandler
+      Description: Websocket connection function
+
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - ConnectHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: Test Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectHandler.Arn}/invocations
+
+  ConnectGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ConnectIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ConnectHandler
+      Principal: apigateway.amazonaws.com
+
+
+  UpdateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - UpdateGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: update
+      OperationName: UpdateRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref UpdateIntegration
+
+  UpdateHandler:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - SocketAPI
+    Properties:
+      Handler: src/permaximize_game.updateHandler
+      Description: Websocket update function
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GamesTable
+        # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'execute-api:ManageConnections'
+              Resource:
+                - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
+  UpdateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - UpdateHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: Test update Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateHandler.Arn}/invocations
+
+  UpdateGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - UpdateIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref UpdateHandler
+      Principal: apigateway.amazonaws.com
+
+
+  NewGameRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - NewGameGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: new
+      OperationName: NewGameRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref NewGameIntegration
+
+  NewGameHandler:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - SocketAPI
+    Properties:
+      Handler: src/permaximize_game.newGameHandler
+      Description: Websocket new game function
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GamesTable
+        # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'execute-api:ManageConnections'
+              Resource:
+                - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
+  NewGameIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - NewGameHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: NewGame Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NewGameHandler.Arn}/invocations
+
+  NewGameGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - NewGameIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref NewGameHandler
+      Principal: apigateway.amazonaws.com
+
+
+  JoinGameRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - JoinGameGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: join
+      OperationName: JoinGameRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref JoinGameIntegration
+
+  JoinGameHandler:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - SocketAPI
+    Properties:
+      Handler: src/permaximize_game.joinGameHandler
+      Description: Websocket join game function
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GamesTable
+        # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'execute-api:ManageConnections'
+              Resource:
+                - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
+  JoinGameIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - JoinGameHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: JoinGame Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JoinGameHandler.Arn}/invocations
+
+  JoinGameGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - JoinGameIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref JoinGameHandler
+      Principal: apigateway.amazonaws.com
+
+
+  ResetGameRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - ResetGameGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: reset
+      OperationName: ResetGameRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ResetGameIntegration
+
+  ResetGameHandler:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - SocketAPI
+    Properties:
+      Handler: src/permaximize_game.resetGameHandler
+      Description: Websocket reset game function
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GamesTable
+        # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'execute-api:ManageConnections'
+              Resource:
+                - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
+  ResetGameIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - ResetGameHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: ResetGame Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ResetGameHandler.Arn}/invocations
+
+  ResetGameGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ResetGameIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ResetGameHandler
+      Principal: apigateway.amazonaws.com
+
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - DefaultGatewayPermission
+    Properties:
+      ApiId: !Ref SocketAPI
+      RouteKey: $default
+      OperationName: DefaultRoute
+      AuthorizationType: NONE
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref DefaultIntegration
+
+  DefaultHandler:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - SocketAPI
+    Properties:
+      Handler: src/permaximize_game.defaultHandler
+      Description: Websocket default function
+      Policies:
+        # https://serverlessland.com/patterns/apigw-websocket-api-lambda
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'execute-api:ManageConnections'
+              Resource:
+                - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SocketAPI}/*'
+
+  DefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - SocketAPI
+      - DefaultHandler
+    Properties:
+      ApiId: !Ref SocketAPI
+      Description: Test Default Integration
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DefaultHandler.Arn}/invocations
+
+  DefaultGatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - DefaultIntegration
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DefaultHandler
+      Principal: apigateway.amazonaws.com
+
+
+  GamesTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: Number
+      TableName: Games
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "wss://${SocketAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

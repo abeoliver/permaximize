@@ -14,9 +14,9 @@ class SocketServer {
     this.games = {}
 
     // Start mongoose
-    mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => console.log("CONNECTED TO MONGO"))
-        .catch((err) => console.error(err));
+    //mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
+    //    .then(() => console.log("CONNECTED TO MONGO"))
+    //    .catch((err) => console.error(err));
 
     // Attach socket handlers
     this.io.on('connection', (socket) => {

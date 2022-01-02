@@ -25,3 +25,7 @@ yarn-error.log*
 .idea/
 keys/
 media/
+
+log/
+/backend/.aws-sam/
+/backend/build/
